@@ -41,9 +41,11 @@ import {TypeChecker} from "../utilities/TypeChecker";
 import {LocationCollection} from "../collections/LocationCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
+import {RoleCollection} from "../collections/RoleCollection";
 
 @inject(
     Factory.of(PageCollection),
+    Factory.of(RoleCollection),
     Factory.of(PagesMapViewSettings),
     Factory.of(LocationCollection),
     Factory.of(FunctionCollection),
@@ -57,6 +59,7 @@ export class Story extends BaseModel {
     private _name: string;
     private _description: string;
     private _pages: PageCollection;
+    private _roles: RoleCollection;
     private _cachedMediaIds: Array<string>;
     private _conditions: ConditionCollection;
     private _functions: FunctionCollection;
@@ -67,7 +70,8 @@ export class Story extends BaseModel {
     private _publishState: string;
     private _storyOptions: StoryOptions;
 
-    constructor(private pageCollectionFactory: (any?) => PageCollection,
+    constructor(private roleCollectionFactory: (any?) => RoleCollection,
+                private pageCollectionFactory: (any?) => PageCollection,
                 private pagesMapViewSettingsFactory: (any?) => PagesMapViewSettings,
                 private locationCollectionFactory: (any?) => LocationCollection,
                 private functionCollectionFactory: (any?) => FunctionCollection,
@@ -83,6 +87,7 @@ export class Story extends BaseModel {
         id: undefined,
         name: undefined,
         pages: undefined,
+        roles: undefined,
         cachedMediaIds: undefined,
         conditions: undefined,
         pagesMapViewSettings: undefined,
@@ -110,6 +115,7 @@ export class Story extends BaseModel {
         this.locations = this.locationCollectionFactory(data.locations);
         this.publishState = data.publishState;
         this.storyOptions = this.storyOptionsFactory(data.storyOptions);
+        this.roles = this.roleCollectionFactory(data.roles);
     }
 
     public toJSON() {
@@ -127,7 +133,9 @@ export class Story extends BaseModel {
             audience: this.audience,
             locations: this.locations,
             publishState: this.publishState,
-            storyOptions: this.storyOptions
+            storyOptions: this.storyOptions,
+            roles: this.roles
+
         }
     }
 
@@ -245,6 +253,15 @@ export class Story extends BaseModel {
     set locations(value: LocationCollection) {
         this.typeChecker.validateAsObjectOrUndefined("Locations", value, "LocationCollection", LocationCollection);
         this._locations = value;
+    }
+
+    get roles(): RoleCollection {
+      return this._roles;
+    }
+
+    set roles(value: RoleCollection) {
+        this.typeChecker.validateAsObjectOrUndefined("Roles", value, "RoleCollection", RoleCollection);
+        this._roles = value;
     }
 
 }
