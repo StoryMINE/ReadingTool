@@ -47,6 +47,7 @@ export class Page extends BaseModel {
     private _conditions: Array<string>;
     private _content: string;
     private _pageTransition: string;
+    private _messageToObservers: string;
     private _hintDirection: string;
     private _hintLocations: Array<string>;
     private _functions: Array<string>
@@ -65,6 +66,7 @@ export class Page extends BaseModel {
         conditions: undefined,
         content: undefined,
         pageTransition: undefined,
+        messageToObservers: undefined,
         hint: {locations: undefined, direction: undefined},
         functions: undefined
     }) {
@@ -74,6 +76,7 @@ export class Page extends BaseModel {
         this.conditions = data.conditions;
         this.content = data.content;
         this.pageTransition = data.pageTransition;
+        this.messageToObservers = data.messageToObservers;
         if (data.hint) {
             this.hintLocations = data.hint.locations;
             this.hintDirection = data.hint.direction;
@@ -89,6 +92,7 @@ export class Page extends BaseModel {
             content: this.content,
             functions: this.functions,
             pageTransition: this.pageTransition,
+            messageToObservers: this.messageToObservers,
             hint: {
                 direction: this.hintDirection,
                 locations: this.hintLocations
@@ -155,6 +159,14 @@ export class Page extends BaseModel {
         this._pageTransition = value;
     }
 
+    get messageToObservers(): string {
+        return this._messageToObservers;
+    }
+
+    set messageToObservers(value: string) {
+      this.typeChecker.validateAsStringOrUndefined("MessageToObservers", value);
+      this._messageToObservers = value;
+    }
 
     get content(): string {
         return this._content;
