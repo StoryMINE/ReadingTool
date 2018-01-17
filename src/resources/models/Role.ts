@@ -47,7 +47,7 @@ export class Role extends BaseModel {
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, readingId: undefined, userId: undefined, variables: undefined, name:undefined, state:undefined}) {
+    fromObject(data: any = {id: undefined, name:undefined, required:undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
         this.name = data.name;
