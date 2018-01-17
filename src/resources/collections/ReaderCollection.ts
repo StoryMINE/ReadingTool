@@ -34,11 +34,11 @@
  */
 
 import {BaseCollection} from "./BaseCollection";
-import {inject, Factory} from "aurelia-framework";
+import {Factory, inject} from "aurelia-framework";
 import {Reader} from "../models/Reader";
 
 @inject(Factory.of(Reader))
-export class ReadingCollection extends BaseCollection<Reader> {
+export class ReaderCollection extends BaseCollection<Reader> {
     constructor(private factory: (any?) => Reader, data?: any[]) {
         super();
 
