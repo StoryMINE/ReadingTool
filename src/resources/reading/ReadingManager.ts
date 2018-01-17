@@ -40,6 +40,8 @@ import {StoryConnector} from "../store/StoryConnector";
 import {ReadingConnector} from "../store/ReadingConnector";
 import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
+import {CompositeState} from "../utilities/CompositeState";
+import {VariableAccessor} from "../interfaces/VariableAccessor";
 
 @autoinject()
 export class ReadingManager {
@@ -109,17 +111,21 @@ export class ReadingManager {
         }
     }
 
+    private getVariableAccessor(): VariableAccessor {
+      return new CompositeState({global: this.story.globalStates, shared: this.reading.sharedStates})
+    }
+
     private updateStatus() {
         console.log("updating page status");
         this.story.pages.forEach(page => {
-            page.updateStatus(this.reading.variables, this.story.conditions, this.story.locations, this.locationManager.location);
+            page.updateStatus(this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location);
         });
 
         this.viewablePages = this.story.pages.all.filter(page => page.isViewable);
     }
 
     executePageFunctions(page: Page) {
-        page.executeFunctions(this.story.id, this.reading.id, this.reading.variables, this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
+      page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
         this.saveReading();
     }
 
