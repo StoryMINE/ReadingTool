@@ -43,11 +43,10 @@ import {ReaderCollection} from "../collections/ReaderCollection";
         TypeChecker)
 export class Reading extends BaseModel {
 
-
-    private _variables: VariableCollection;
-    private _readers: ReaderCollection;
-    private _storyId: string;
     private _name: string;
+    private _storyId: string;
+    private _readers: ReaderCollection;
+    private _variables: VariableCollection;
     private _state: string;
     private _timestamp: number;
 
