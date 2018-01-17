@@ -40,6 +40,24 @@ export class TypeChecker {
         }
     }
 
+    //This should NOT be done using TypeError exception, but that's the only way to reuse existing funcs.
+    validateAsUnionOrUndefined(fieldName: string, value: any, types: [Function | string]) {
+        for(let type of types) {
+          try {
+            if(typeof type == "function") {
+              this.validateAsObjectOrUndefined(fieldName, value, "UnionObj", type);
+            } else if(typeof type == "string") {
+              this.validateAsScalarOrUndefined(fieldName, value, type)
+            } else {
+              throw TypeError(fieldName + "attempted to validate against invalid type " + type);
+            }
+            return;
+          } catch(err) {
+          }
+        }
+        throw TypeError(fieldName + "is not part of the Union Type" + types);
+    }
+
     validateAsStringOrUndefined(fieldName: string, value: any) {
         this.validateAsScalarOrUndefined(fieldName, value, 'string');
     }
