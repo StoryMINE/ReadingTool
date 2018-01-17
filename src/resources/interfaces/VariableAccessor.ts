@@ -4,11 +4,12 @@
  *
  This application was developed as part of the Leverhulme Trust funded
  StoryPlaces Project. For more information, please visit storyplaces.soton.ac.uk
- Copyright (c) 2017
+ Copyright (c) 2018
  University of Southampton
  Charlie Hargood, cah07r.ecs.soton.ac.uk
  Kevin Puplett, k.e.puplett.soton.ac.uk
  David Pepper, d.pepper.soton.ac.uk
+ Callum Spawforth, cs14g13@soton.ac.uk
 
  All rights reserved.
  Redistribution and use in source and binary forms, with or without
@@ -36,6 +37,11 @@
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
 
+/*
+By using this, it allows us to change how all of the Conditions and Functions access their variables.
+This was introduced to allow for variables to be contained in multiple places using CompositeState.
+ */
 export interface VariableAccessor {
     get(key: VariableReference): Variable;
+    save(key: VariableReference, value: string);
 }

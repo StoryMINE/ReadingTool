@@ -104,9 +104,9 @@ export class IncrementFunction extends BaseFunction {
         let currentValue = parseInt(variable.value);
         let newValue = currentValue + parseInt(this.value);
 
-        variable.value = newValue.toString();
-        variables.save(variable);
-        this.loggingHelper.logChangeVariable(storyId, readingId, variable.id, variable.value);
+        variables.save(this.variable, newValue.toString());
+
+        this.loggingHelper.logChangeVariable(storyId, readingId, this.variable.id, variable.value);
     }
 
 }

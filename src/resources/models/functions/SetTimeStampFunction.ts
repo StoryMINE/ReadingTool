@@ -90,8 +90,9 @@ export class SetTimeStampFunction extends BaseFunction {
 
         let variable = variables.get(this.variable) || {id: this.variable, value: undefined};
 
-        variable.value = moment().unix().toString();
-        variables.save(variable);
-        this.loggingHelper.logChangeVariable(storyId, readingId, variable.id, variable.value);
+        let newValue = moment().unix().toString();
+        variables.save(this.variable, newValue);
+
+        this.loggingHelper.logChangeVariable(storyId, readingId, this.variable.id, variable.value);
     }
 }

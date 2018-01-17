@@ -99,10 +99,9 @@ export class SetFunction extends BaseFunction {
             return;
         }
 
-        let variable = variables.get(this.variable) || {id: this.variable, value: undefined};
+        let variable = variables.get(this.variable) || {id: this.variable.variable, value: undefined};
 
-        variable.value = this.value;
-        variables.save(variable);
+        variables.save(this.variable, this.value);
 
         this.loggingHelper.logChangeVariable(storyId, readingId, variable.id, variable.value);
     }
