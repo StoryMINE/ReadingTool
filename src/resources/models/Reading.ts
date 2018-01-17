@@ -36,28 +36,33 @@ import {VariableCollection} from "../collections/VariableCollection";
 import {inject, Factory} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
+import {ReaderCollection} from "../collections/ReaderCollection";
 
-@inject(Factory.of(VariableCollection), TypeChecker)
+@inject(Factory.of(VariableCollection),
+        Factory.of(ReaderCollection),
+        TypeChecker)
 export class Reading extends BaseModel {
 
 
     private _variables: VariableCollection;
-    private _userId: string;
+    private _readers: ReaderCollection;
     private _storyId: string;
     private _name: string;
     private _state: string;
     private _timestamp: number;
 
-    constructor(private variableCollectionFactory: (any?) => VariableCollection, typeChecker: TypeChecker, data?: any) {
+    constructor(private variableCollectionFactory: (any?) => VariableCollection,
+                private readerCollectionFactory: (any?) => ReaderCollection,
+                typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, readingId: undefined, userId: undefined, variables: undefined, name:undefined, state:undefined}) {
+    fromObject(data: any = {id: undefined, readingId: undefined, readers: undefined, variables: undefined, name:undefined, state:undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
         this.storyId = data.storyId;
-        this.userId = data.userId;
+        this.readers = this.readerCollectionFactory(data.readers);
         this.name = data.name;
         this.variables = this.variableCollectionFactory(data.variables);
         this.state = (data.state || "notstarted");
@@ -69,7 +74,7 @@ export class Reading extends BaseModel {
             id: this.id,
             name: this.name,
             storyId: this.storyId,
-            userId: this.userId,
+            readers: this.readers,
             variables: this.variables,
             state: this.state,
             timestamp: this.timestamp,
@@ -115,13 +120,13 @@ export class Reading extends BaseModel {
         this._storyId = value;
     }
 
-    get userId(): string {
-        return this._userId;
+    get readers(): ReaderCollection {
+        return this._readers;
     }
 
-    set userId(userId: string) {
-        this.typeChecker.validateAsStringOrUndefined('UserId', userId);
-        this._userId = userId;
+    set readers(value: ReaderCollection) {
+        this.typeChecker.validateAsObjectOrUndefined('Readers', value, "ReaderCollection", ReaderCollection);
+        this._readers = value;
     }
 
     get variables(): VariableCollection {
