@@ -42,6 +42,7 @@ import {LocationCollection} from "../collections/LocationCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {RoleCollection} from "../collections/RoleCollection";
+import {StateCollection} from "../collections/StateCollection";
 
 @inject(
     Factory.of(PageCollection),
@@ -51,6 +52,7 @@ import {RoleCollection} from "../collections/RoleCollection";
     Factory.of(FunctionCollection),
     Factory.of(ConditionCollection),
     Factory.of(StoryOptions),
+    Factory.of(StateCollection),
     TypeChecker
 )
 export class Story extends BaseModel {
@@ -69,6 +71,7 @@ export class Story extends BaseModel {
     private _locations: LocationCollection;
     private _publishState: string;
     private _storyOptions: StoryOptions;
+    private _globalStates: StateCollection;
 
     constructor(private roleCollectionFactory: (any?) => RoleCollection,
                 private pageCollectionFactory: (any?) => PageCollection,
@@ -77,6 +80,7 @@ export class Story extends BaseModel {
                 private functionCollectionFactory: (any?) => FunctionCollection,
                 private conditionCollectionFactory: (any?) => ConditionCollection,
                 private storyOptionsFactory: (any?) => StoryOptions,
+                private stateCollectionFactory: (any?) => StateCollection,
                 typeChecker: TypeChecker,
                 data?: any) {
         super(typeChecker);
@@ -98,7 +102,8 @@ export class Story extends BaseModel {
         audience: undefined,
         locations: undefined,
         publishState: undefined,
-        storyOptions: undefined
+        storyOptions: undefined,
+        globalStates: undefined
     }) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
@@ -116,6 +121,7 @@ export class Story extends BaseModel {
         this.publishState = data.publishState;
         this.storyOptions = this.storyOptionsFactory(data.storyOptions);
         this.roles = this.roleCollectionFactory(data.roles);
+        this.globalStates = this.stateCollectionFactory(data.globalStates);
     }
 
     public toJSON() {
@@ -134,8 +140,8 @@ export class Story extends BaseModel {
             locations: this.locations,
             publishState: this.publishState,
             storyOptions: this.storyOptions,
-            roles: this.roles
-
+            roles: this.roles,
+            globalStates: this.globalStates
         }
     }
 
@@ -262,6 +268,15 @@ export class Story extends BaseModel {
     set roles(value: RoleCollection) {
         this.typeChecker.validateAsObjectOrUndefined("Roles", value, "RoleCollection", RoleCollection);
         this._roles = value;
+    }
+
+    get globalStates(): StateCollection {
+      return this._globalStates;
+    }
+
+    set globalStates(value: StateCollection) {
+      this.typeChecker.validateAsObjectOrUndefined("GlobalStates", value, "StateCollection", StateCollection);
+      this._globalStates = value;
     }
 
 }
