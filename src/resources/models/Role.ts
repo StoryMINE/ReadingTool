@@ -39,7 +39,6 @@ import {TypeChecker} from "../utilities/TypeChecker";
 @inject(TypeChecker)
 export class Role extends BaseModel {
 
-    private _name: string;
     private _required: boolean;
 
     constructor(typeChecker: TypeChecker, data?: any) {
@@ -47,28 +46,17 @@ export class Role extends BaseModel {
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, name:undefined, required:undefined}) {
+    fromObject(data: any = {id: undefined, required:undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
-        this.name = data.name;
         this.required = data.required;
     }
 
     toJSON() {
         return {
             id: this.id,
-            name: this.name,
             required: this.required
         }
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this.typeChecker.validateAsStringOrUndefined('Name', value);
-        this._name = value;
     }
 
     get required(): boolean {

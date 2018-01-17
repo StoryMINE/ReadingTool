@@ -40,7 +40,6 @@ import {TypeChecker} from "../utilities/TypeChecker";
 @inject(Factory.of(VariableCollection), TypeChecker)
 export class State extends BaseModel {
 
-    private _name: string;
     private _variables: VariableCollection;
 
     constructor(private variableCollectionFactory: (any?) => VariableCollection, typeChecker: TypeChecker, data?: any) {
@@ -48,28 +47,17 @@ export class State extends BaseModel {
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, name:undefined, variables: undefined}) {
+    fromObject(data: any = {id: undefined, variables: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
-        this.name = data.name;
         this.variables = this.variableCollectionFactory(data.variables);
     }
 
     toJSON() {
         return {
             id: this.id,
-            name: this.name,
             variables: this.variables
         }
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this.typeChecker.validateAsStringOrUndefined('Name', value);
-        this._name = value;
     }
 
     get variables(): VariableCollection {

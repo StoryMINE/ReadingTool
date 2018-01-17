@@ -40,7 +40,6 @@ import {Role} from "./Role";
 @inject(TypeChecker)
 export class Reader extends BaseModel {
 
-    private _userId: string;
     private _roleName: string;
 
     constructor(typeChecker: TypeChecker, data?: any) {
@@ -48,28 +47,17 @@ export class Reader extends BaseModel {
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, readingId: undefined, userId: undefined, variables: undefined, name:undefined, state:undefined}) {
+    fromObject(data: any = {id: undefined, roleName:undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
-        this.userId = data.userId;
         this.roleName = data.roleName;
     }
 
     toJSON() {
         return {
             id: this.id,
-            userId: this.userId,
             roleName: this.roleName
         }
-    }
-
-    get userId(): string {
-        return this._userId;
-    }
-
-    set userId(value: string) {
-        this.typeChecker.validateAsStringOrUndefined('UserId', value);
-        this._userId = value;
     }
 
     get roleName(): string {
