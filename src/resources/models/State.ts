@@ -33,13 +33,16 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {VariableCollection} from "../collections/VariableCollection";
-import {inject, Factory} from "aurelia-framework";
+import {inject, BindingEngine, Factory} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 
-@inject(Factory.of(VariableCollection), TypeChecker)
+@inject(Factory.of(VariableCollection),
+        BindingEngine,
+        TypeChecker)
 export class State extends BaseModel {
 
+    private _bindingEngine: BindingEngine;
     private _variables: VariableCollection;
 
     constructor(private variableCollectionFactory: (any?) => VariableCollection, typeChecker: TypeChecker, data?: any) {
@@ -67,6 +70,10 @@ export class State extends BaseModel {
     set variables(value: VariableCollection) {
         this.typeChecker.validateAsObjectOrUndefined("Variables", value, "VariableCollection", VariableCollection);
         this._variables = value;
+    }
+
+    subscribe(callback: () => void) {
+        this._bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
     }
 
 }

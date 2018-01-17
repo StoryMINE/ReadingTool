@@ -36,6 +36,7 @@
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
+import {Disposable} from "aurelia-framework";
 
 export class CompositeState implements VariableAccessor {
 
@@ -53,8 +54,11 @@ export class CompositeState implements VariableAccessor {
       throw new Error("Method not implemented.");
     }
 
-    subscribe(callback: () => void) {
-      this.states.entries().forEach((state) => state.subscribe(callback));
+    subscribe(callback: () => void): Disposable {
+      let disposables = this.states.entries().map((state) => state.subscribe(callback));
+      return {
+        dispose: () => disposables.forEach((item) => item.dispose())
+      }
     }
 
 }

@@ -41,7 +41,6 @@ import {ReadingConnector} from "../store/ReadingConnector";
 import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {CompositeState} from "../utilities/CompositeState";
-import {VariableAccessor} from "../interfaces/VariableAccessor";
 
 @autoinject()
 export class ReadingManager {
@@ -89,7 +88,7 @@ export class ReadingManager {
     }
 
     private attachListeners() {
-        this.variableSub = this.bindingEngine.collectionObserver(this.reading.variables.all).subscribe(() => this.updateStatus());
+        this.variableSub = this.getVariableAccessor().subscribe(() => this.updateStatus());
         this.locationSub = this.bindingEngine.propertyObserver(this.locationManager, 'location').subscribe(() => this.updateStatus());
         this.timeSub = window.setInterval(() => this.updateStatus(), 60 * 1000);
     }
@@ -111,7 +110,7 @@ export class ReadingManager {
         }
     }
 
-    private getVariableAccessor(): VariableAccessor {
+    private getVariableAccessor(): CompositeState {
       return new CompositeState({global: this.story.globalStates, shared: this.reading.sharedStates})
     }
 
