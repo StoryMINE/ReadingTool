@@ -35,15 +35,16 @@
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {LocationCollection} from "../../collections/LocationCollection";
+import {VariableReference} from "../VariableReference";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 @inject(TypeChecker)
 export class ComparisonCondition extends BaseCondition {
-    private _a: string;
-    private _b: string;
+    private _a: VariableReference | string;
+    private _b: VariableReference | string;
     private _aType: string;
     private _bType: string;
     private _operand: string;
@@ -96,11 +97,11 @@ export class ComparisonCondition extends BaseCondition {
         this._bType = value;
     }
 
-    get a(): string {
+    get a(): VariableReference | string {
         return this._a;
     }
 
-    set a(value: string) {
+    set a(value: VariableReference | string) {
 
         if (value !== undefined && this.aType === undefined) {
             throw TypeError("Type of a must be set before setting value");
@@ -108,26 +109,32 @@ export class ComparisonCondition extends BaseCondition {
 
         if (this.aType === "Integer") {
             this.validateIsANumber("a", value);
+        } else if (this.aType === "Variable") {
+            this.typeChecker.validateAsObjectOrUndefined("a", value, "VariableReference", VariableReference);
+        } else {
+            this.typeChecker.validateAsStringOrUndefined("a", value);
         }
 
-        this.typeChecker.validateAsStringOrUndefined("a", value);
         this._a = value;
     }
 
-    get b(): string {
+    get b(): VariableReference | string {
         return this._b;
     }
 
-    set b(value: string) {
+    set b(value: VariableReference | string) {
         if (value !== undefined && this.bType === undefined) {
             throw TypeError("Type of b must be set before setting value");
         }
 
         if (this.bType === "Integer") {
             this.validateIsANumber("b", value);
+        } else if (this.bType === "Variable") {
+            this.typeChecker.validateAsObjectOrUndefined("b", value, "VariableReference", VariableReference);
+        } else {
+            this.typeChecker.validateAsStringOrUndefined("b", value);
         }
 
-        this.typeChecker.validateAsStringOrUndefined("b", value);
         this._b = value;
     }
 
@@ -172,7 +179,7 @@ export class ComparisonCondition extends BaseCondition {
         return (operand === undefined || operand == '==' || operand == '!=' || operand == '<' || operand == '>' || operand == '<=' || operand == '>=');
     }
 
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+  execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         let a = this.getValue(this.a, this.aType, variables);
         let b = this.getValue(this.b, this.bType, variables);
 
@@ -193,8 +200,8 @@ export class ComparisonCondition extends BaseCondition {
         return false;
     }
 
-    private getValue(value: string, type: string, variables: VariableCollection): string | number {
-        if (type == "Variable") {
+    private getValue(value: VariableReference | string, type: string, variables: VariableAccessor): string | number {
+        if (type == "Variable" && value instanceof VariableReference) {
             let variable = variables.get(value);
 
             if (!variable) {
@@ -204,10 +211,14 @@ export class ComparisonCondition extends BaseCondition {
             return variable.value;
         }
 
-        if (type == "Integer") {
+        if (type == "Integer" && typeof value == "string") {
             return parseInt(value);
         }
 
-        return value;
+        if (type == "String" && typeof value == "string") {
+            return value;
+        }
+
+        throw new TypeError("Comparison Condition: getValue is in an impossible state! Value " + value + " not a valid type.");
     }
 }

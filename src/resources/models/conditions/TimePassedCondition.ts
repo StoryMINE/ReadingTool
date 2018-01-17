@@ -35,16 +35,17 @@
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
+import {VariableReference} from "../VariableReference";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 import moment = require('moment');
 
 @inject(TypeChecker)
 export class TimePassedCondition extends BaseCondition {
 
-    private _variable: string;
+    private _variable: VariableReference;
     private _minutes: number;
 
     constructor(typeChecker: TypeChecker, data?: any) {
@@ -71,12 +72,12 @@ export class TimePassedCondition extends BaseCondition {
         };
     }
 
-    get variable(): string {
+    get variable(): VariableReference {
         return this._variable;
     }
 
-    set variable(value: string) {
-        this.typeChecker.validateAsStringOrUndefined("variable", value);
+    set variable(value: VariableReference) {
+        this.typeChecker.validateAsObjectOrUndefined("variable", value, "VariableReference", VariableReference);
         this._variable = value;
     }
 
@@ -89,7 +90,7 @@ export class TimePassedCondition extends BaseCondition {
         this._minutes = value;
     }
 
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+  execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         let timeStamp = variables.get(this.variable);
 
         if (!timeStamp) {

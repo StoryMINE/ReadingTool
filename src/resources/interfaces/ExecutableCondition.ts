@@ -33,11 +33,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {VariableCollection} from "../collections/VariableCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {LocationInformation} from "../gps/LocationInformation";
 import {LocationCollection} from "../collections/LocationCollection";
+import {VariableAccessor} from "./VariableAccessor";
 
 export interface ExecutableCondition {
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean;
+  execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean;
 }

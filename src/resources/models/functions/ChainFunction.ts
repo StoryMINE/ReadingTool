@@ -35,12 +35,12 @@
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
 import {BaseFunction} from "./BaseFunction";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {LoggingHelper} from "../../logging/LoggingHelper";
 import {FunctionCollection} from "../../collections/FunctionCollection";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 @inject(TypeChecker, LoggingHelper)
 
@@ -82,7 +82,7 @@ export class ChainFunction extends BaseFunction {
     }
 
 
-    execute(storyId: string, readingId: string, variables: VariableCollection, conditions: ConditionCollection, functions: FunctionCollection, locations?: LocationCollection, userLocation?: LocationInformation) {
+  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }

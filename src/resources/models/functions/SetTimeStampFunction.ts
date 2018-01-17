@@ -35,19 +35,20 @@
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
 import {BaseFunction} from "./BaseFunction";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
-import moment = require('moment');
 import {LoggingHelper} from "../../logging/LoggingHelper";
 import {FunctionCollection} from "../../collections/FunctionCollection";
+import {VariableReference} from "../VariableReference";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import moment = require('moment');
 
 @inject(TypeChecker, LoggingHelper)
 
 export class SetTimeStampFunction extends BaseFunction {
 
-    private _variable: string;
+    private _variable: VariableReference;
 
     constructor(typeChecker: TypeChecker, private loggingHelper: LoggingHelper, data?: any) {
         super(typeChecker);
@@ -73,16 +74,16 @@ export class SetTimeStampFunction extends BaseFunction {
         };
     }
 
-    get variable(): string {
+    get variable(): VariableReference {
         return this._variable;
     }
 
-    set variable(value: string) {
-        this.typeChecker.validateAsStringOrUndefined("Value", value);
+    set variable(value: VariableReference) {
+        this.typeChecker.validateAsObjectOrUndefined("Value", value, "VariableReference", VariableReference);
         this._variable = value;
     }
 
-    execute(storyId: string, readingId: string, variables: VariableCollection, conditions: ConditionCollection, functions: FunctionCollection, locations?: LocationCollection, userLocation?: LocationInformation) {
+  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }

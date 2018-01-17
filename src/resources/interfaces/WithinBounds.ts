@@ -33,8 +33,6 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {VariableCollection} from "../collections/VariableCollection";
-import {ConditionCollection} from "../collections/ConditionCollection";
 import {LocationInformation} from "../gps/LocationInformation";
 
 export interface WithinBounds {

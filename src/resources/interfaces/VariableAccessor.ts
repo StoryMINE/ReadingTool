@@ -4,7 +4,7 @@
  *
  This application was developed as part of the Leverhulme Trust funded
  StoryPlaces Project. For more information, please visit storyplaces.soton.ac.uk
- Copyright (c) 2016
+ Copyright (c) 2017
  University of Southampton
  Charlie Hargood, cah07r.ecs.soton.ac.uk
  Kevin Puplett, k.e.puplett.soton.ac.uk
@@ -32,52 +32,10 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import {BaseCondition} from "./BaseCondition";
-import {TypeChecker} from "../../utilities/TypeChecker";
-import {inject} from "aurelia-framework";
-import {ConditionCollection} from "../../collections/ConditionCollection";
-import {LocationInformation} from "../../gps/LocationInformation";
-import {LocationCollection} from "../../collections/LocationCollection";
-import {VariableReference} from "../VariableReference";
-import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
-@inject(TypeChecker)
-export class CheckCondition extends BaseCondition{
+import {VariableReference} from "../models/VariableReference";
+import {Variable} from "../models/Variable";
 
-    private _variable: VariableReference;
-
-    constructor(typeChecker: TypeChecker, data?: any) {
-        super(typeChecker);
-
-        if (data) {
-            this.fromObject(data);
-        }
-    }
-
-    fromObject(data = {id: undefined, variable: undefined}) {
-        this.typeChecker.validateAsObjectAndNotArray("Data", data);
-        this.id = data.id;
-        this.variable = data.variable;
-    }
-
-    toJSON() {
-        return {
-            id: this.id,
-            type: "check",
-            variable: this.variable
-        };
-    }
-
-    get variable(): VariableReference {
-        return this._variable;
-    }
-
-    set variable(value: VariableReference) {
-        this.typeChecker.validateAsObjectOrUndefined("variable", value, "VariableReference", VariableReference);
-        this._variable = value;
-    }
-
-    execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
-        return variables.get(this.variable) !== undefined;
-    }
+export interface VariableAccessor {
+    get(key: VariableReference): Variable;
 }

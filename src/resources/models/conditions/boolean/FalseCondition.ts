@@ -35,10 +35,10 @@
 import {BaseCondition} from "../BaseCondition";
 import {TypeChecker} from "../../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../../../collections/VariableCollection";
 import {ConditionCollection} from "../../../collections/ConditionCollection";
 import {LocationInformation} from "../../../gps/LocationInformation";
 import {LocationCollection} from "../../../collections/LocationCollection";
+import {VariableAccessor} from "../../../interfaces/VariableAccessor";
 
 @inject(TypeChecker)
 export class FalseCondition extends BaseCondition {
@@ -63,7 +63,7 @@ export class FalseCondition extends BaseCondition {
         };
     }
 
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+  execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         return false;
     }
 }

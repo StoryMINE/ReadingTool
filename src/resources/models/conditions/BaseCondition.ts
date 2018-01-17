@@ -35,16 +35,16 @@
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {BaseModel} from "../BaseModel";
 import {ExecutableCondition} from "../../interfaces/ExecutableCondition";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 export abstract class BaseCondition extends BaseModel implements ExecutableCondition {
     constructor(typeChecker: TypeChecker) {
         super(typeChecker);
     }
 
-    abstract execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean;
+    abstract execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean;
 
 }

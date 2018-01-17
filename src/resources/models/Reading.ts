@@ -32,38 +32,38 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import {VariableCollection} from "../collections/VariableCollection";
-import {inject, Factory} from "aurelia-framework";
+import {Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {ReaderCollection} from "../collections/ReaderCollection";
+import {StateCollection} from "../collections/StateCollection";
 
-@inject(Factory.of(VariableCollection),
-        Factory.of(ReaderCollection),
+@inject(Factory.of(ReaderCollection),
+        Factory.of(StateCollection),
         TypeChecker)
 export class Reading extends BaseModel {
 
     private _name: string;
     private _storyId: string;
     private _readers: ReaderCollection;
-    private _variables: VariableCollection;
+    private _sharedStates: StateCollection;
     private _state: string;
     private _timestamp: number;
 
-    constructor(private variableCollectionFactory: (any?) => VariableCollection,
-                private readerCollectionFactory: (any?) => ReaderCollection,
+    constructor(private readerCollectionFactory: (any?) => ReaderCollection,
+                private stateCollectionFactory: (any?) => StateCollection,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, readingId: undefined, readers: undefined, variables: undefined, name:undefined, state:undefined}) {
+    fromObject(data: any = {id: undefined, name:undefined, storyId: undefined, readers: undefined, sharedStates: undefined, state:undefined, timestamp: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
+        this.name = data.name;
         this.storyId = data.storyId;
         this.readers = this.readerCollectionFactory(data.readers);
-        this.name = data.name;
-        this.variables = this.variableCollectionFactory(data.variables);
+        this.sharedStates = this.stateCollectionFactory(data.sharedStates);
         this.state = (data.state || "notstarted");
         this.timestamp = data.timestamp;
     }
@@ -74,7 +74,7 @@ export class Reading extends BaseModel {
             name: this.name,
             storyId: this.storyId,
             readers: this.readers,
-            variables: this.variables,
+            sharedStates: this.sharedStates,
             state: this.state,
             timestamp: this.timestamp,
         }
@@ -128,13 +128,13 @@ export class Reading extends BaseModel {
         this._readers = value;
     }
 
-    get variables(): VariableCollection {
-        return this._variables;
+    get sharedStates(): StateCollection {
+      return this._sharedStates;
     }
 
-    set variables(value: VariableCollection) {
-        this.typeChecker.validateAsObjectOrUndefined("Variables", value, "VariableCollection", VariableCollection);
-        this._variables = value;
+    set sharedStates(value: StateCollection) {
+      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "StateCollection", StateCollection);
+      this._sharedStates = value;
     }
 
 }

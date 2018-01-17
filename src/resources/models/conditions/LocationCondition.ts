@@ -35,10 +35,10 @@
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {LocationCollection} from "../../collections/LocationCollection";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 @inject(TypeChecker)
 export class LocationCondition extends BaseCondition {
@@ -88,7 +88,7 @@ export class LocationCondition extends BaseCondition {
         this._location = value;
     }
 
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+  execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         // If the conditions are executed with locations or userLocation as undefined it is assumed the conditions are being run not taking location into account so we just return true.
         if (locations == undefined || userLocation == undefined) {
             return true;

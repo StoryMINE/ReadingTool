@@ -35,11 +35,11 @@
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../collections/VariableCollection";
 import {LocationInformation} from "../gps/LocationInformation";
 import {LocationCollection} from "../collections/LocationCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
+import {VariableAccessor} from "../interfaces/VariableAccessor";
 
 @inject(TypeChecker)
 export class Page extends BaseModel {
@@ -193,9 +193,9 @@ export class Page extends BaseModel {
         this._isViewable = value;
     }
 
-    public updateStatus(variables: VariableCollection, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation) {
+    public updateStatus(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation) {
         this.isViewable = this.conditions.every((conditionId) => {
-            return this.getCondition(conditions, conditionId).execute(variables, conditions);
+            return this.getCondition(conditions, conditionId).execute(variables, conditions, undefined, undefined);
         });
 
         this.isReadable = this.isViewable
@@ -204,7 +204,7 @@ export class Page extends BaseModel {
             });
     }
 
-    public executeFunctions(storyId: string, readingId: string, variables: VariableCollection, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation, functions: FunctionCollection) {
+    public executeFunctions(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation, functions: FunctionCollection) {
         this.functions.forEach((functionId) => {
             this.getFunction(functions, functionId).execute(storyId, readingId, variables, conditions, functions, locations, userLocation);
         });

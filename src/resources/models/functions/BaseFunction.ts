@@ -34,12 +34,12 @@
  */
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {BaseModel} from "../BaseModel";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {ExecutableFunction} from "../../interfaces/ExecutableFunction";
 import {FunctionCollection} from "../../collections/FunctionCollection";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 export abstract class BaseFunction extends BaseModel implements ExecutableFunction {
     private _conditions: Array<string>;
@@ -57,9 +57,9 @@ export abstract class BaseFunction extends BaseModel implements ExecutableFuncti
         this._conditions = value;
     }
 
-    abstract execute(storyId: string, readingId: string, variables: VariableCollection, conditions: ConditionCollection, functions: FunctionCollection, locations?: LocationCollection, userLocation?: LocationInformation);
+    abstract execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any ;
 
-    protected allConditionsPass(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+    protected allConditionsPass(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         return this.conditions.every((conditionId) => {
             let condition = conditions.get(conditionId);
 

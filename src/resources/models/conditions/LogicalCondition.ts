@@ -35,10 +35,10 @@
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {VariableCollection} from "../../collections/VariableCollection";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
 @inject(TypeChecker)
 
@@ -92,7 +92,7 @@ export class LogicalCondition extends BaseCondition {
         this._conditions = value;
     }
 
-    execute(variables: VariableCollection, conditions: ConditionCollection, locations?: LocationCollection, userLocation?: LocationInformation): boolean {
+    execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         if (this.operand == "AND") {
             return this.conditions.every(conditionIdToExecute => this.lookupAndTestCondition(conditionIdToExecute, variables, conditions, locations, userLocation));
         }
@@ -100,7 +100,7 @@ export class LogicalCondition extends BaseCondition {
         return this.conditions.some(conditionIdToExecute => this.lookupAndTestCondition(conditionIdToExecute, variables, conditions, locations, userLocation));
     }
 
-    private lookupAndTestCondition(conditionIdToExecute, variables: VariableCollection, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation){
+    private lookupAndTestCondition(conditionIdToExecute, variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation){
         let conditionToExecute = conditions.get(conditionIdToExecute);
 
         if (!conditionToExecute) {
