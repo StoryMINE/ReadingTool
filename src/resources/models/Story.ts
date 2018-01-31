@@ -73,8 +73,8 @@ export class Story extends BaseModel {
     private _storyOptions: StoryOptions;
     private _globalStates: StateCollection;
 
-    constructor(private roleCollectionFactory: (any?) => RoleCollection,
-                private pageCollectionFactory: (any?) => PageCollection,
+    constructor(private pageCollectionFactory: (any?) => PageCollection,
+                private roleCollectionFactory: (any?) => RoleCollection,
                 private pagesMapViewSettingsFactory: (any?) => PagesMapViewSettings,
                 private locationCollectionFactory: (any?) => LocationCollection,
                 private functionCollectionFactory: (any?) => FunctionCollection,
