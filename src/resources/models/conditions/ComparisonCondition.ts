@@ -34,14 +34,16 @@
  */
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
-import {inject} from "aurelia-framework";
+import {Factory, inject} from "aurelia-framework";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {VariableReference} from "../VariableReference";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
-@inject(TypeChecker)
+@inject(TypeChecker,
+        Factory.of(VariableReference)
+)
 export class ComparisonCondition extends BaseCondition {
     private _a: VariableReference | string;
     private _b: VariableReference | string;
@@ -49,7 +51,7 @@ export class ComparisonCondition extends BaseCondition {
     private _bType: string;
     private _operand: string;
 
-    constructor(typeChecker: TypeChecker, data?: any) {
+    constructor(typeChecker: TypeChecker, private varRefFactory: (any?) => VariableReference, data?: any) {
         super(typeChecker);
 
         if (data) {
@@ -62,8 +64,8 @@ export class ComparisonCondition extends BaseCondition {
         this.id = data.id;
         this.aType = data.aType;
         this.bType = data.bType;
-        this.a = data.a;
-        this.b = data.b;
+        this.a = (this.aType == "Variable")? this.varRefFactory(data.a) : data.a;
+        this.b = (this.bType == "Variable")? this.varRefFactory(data.b) : data.b;
         this.operand = data.operand;
     }
 

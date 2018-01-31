@@ -34,7 +34,7 @@
  */
 import {BaseCondition} from "./BaseCondition";
 import {TypeChecker} from "../../utilities/TypeChecker";
-import {inject} from "aurelia-framework";
+import {inject, Factory} from "aurelia-framework";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
@@ -43,14 +43,16 @@ import {VariableAccessor} from "../../interfaces/VariableAccessor";
 import moment = require('moment');
 
 
-@inject(TypeChecker)
+@inject(TypeChecker,
+        Factory.of(VariableReference)
+)
 export class TimeRangeCondition extends BaseCondition {
 
     private _variable: VariableReference;
     private _start: string;
     private _end: string;
 
-    constructor(typeChecker: TypeChecker, data?: any) {
+    constructor(typeChecker: TypeChecker, private varRefFactory: (any?) => VariableReference, data?: any) {
         super(typeChecker);
 
         if (data) {
@@ -61,7 +63,7 @@ export class TimeRangeCondition extends BaseCondition {
     fromObject(data = {id: undefined, variable: undefined, start: undefined, end: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
-        this.variable = data.variable;
+        this.variable = this.varRefFactory(data.variable);
         this.start = data.start;
         this.end = data.end;
     }

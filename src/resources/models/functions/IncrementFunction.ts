@@ -33,7 +33,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {TypeChecker} from "../../utilities/TypeChecker";
-import {inject} from "aurelia-framework";
+import {inject, Factory} from "aurelia-framework";
 import {BaseFunction} from "./BaseFunction";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
@@ -43,14 +43,16 @@ import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableReference} from "../VariableReference";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
 
-@inject(TypeChecker, LoggingHelper)
+@inject(TypeChecker,
+        LoggingHelper,
+        Factory.of(VariableReference))
 
 export class IncrementFunction extends BaseFunction {
 
     private _variable: VariableReference;
     private _value: string;
 
-    constructor(typeChecker: TypeChecker, private loggingHelper: LoggingHelper, data?: any) {
+    constructor(typeChecker: TypeChecker, private loggingHelper: LoggingHelper, private varRefFactory: (any?) => VariableReference, data?: any) {
         super(typeChecker);
 
         if (data) {
@@ -61,7 +63,7 @@ export class IncrementFunction extends BaseFunction {
     fromObject(data = {id: undefined, variable: undefined, value: undefined, conditions: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
-        this.variable = data.variable;
+        this.variable = this.varRefFactory(data.variable);
         this.value = data.value;
         this.conditions = data.conditions;
     }
