@@ -33,14 +33,17 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {VariableCollection} from "../collections/VariableCollection";
-import {inject, BindingEngine, Factory} from "aurelia-framework";
+import {inject, BindingEngine, Factory, PropertyObserver} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
+import {VariableAccessor} from "../interfaces/VariableAccessor";
+import {VariableReference} from "./VariableReference";
+import {Variable} from "./Variable";
 
 @inject(Factory.of(VariableCollection),
         BindingEngine,
         TypeChecker)
-export class State extends BaseModel {
+export class State extends BaseModel implements VariableAccessor {
 
     private _bindingEngine: BindingEngine;
     private _variables: VariableCollection;
@@ -72,8 +75,22 @@ export class State extends BaseModel {
         this._variables = value;
     }
 
+    get(varRef: VariableReference): Variable {
+      if(this.id != varRef.namespace) {
+        return null;
+      }
+      return this.variables.get(varRef.variable);
+    }
+
+    save(varRef: VariableReference, value: string) {
+      if(this.id != varRef.namespace) {
+        throw new Error("Error in story, Variable Ref with namespace " + varRef.namespace + " saving in state " + this.id);
+      }
+      let variable = {id: varRef.variable, value: value};
+      this.variables.save(variable);
+    }
+
     subscribe(callback: () => void) {
         this._bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
     }
-
 }

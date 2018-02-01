@@ -37,25 +37,34 @@ import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
 import {Disposable} from "aurelia-framework";
+import {StateCollection} from "../collections/StateCollection";
+import {VariableScope} from "../models/VariableScope";
 
-export class CompositeState implements VariableAccessor {
+export class CompositeScope implements VariableAccessor {
 
-    private states = undefined;
-
-    constructor(stateDictionary: Object) {
-      this.states = stateDictionary;
+    constructor(private stateScopes: {[scopeName: string]: VariableScope}) {
     }
 
-    get(key: VariableReference): Variable {
-      throw new Error("Method not implemented.");
+    getScope(scopeName: string): VariableScope {
+      let scope: VariableScope = this.stateScopes[scopeName];
+      if(!scope) {
+        throw new Error("Story attempts to access invalid variable scope " + scopeName);
+      }
+      return scope;
     }
 
-    save(key: VariableReference, value: string) {
-      throw new Error("Method not implemented.");
+    get(varRef: VariableReference): Variable {
+      return this.getScope(varRef.scope).get(varRef);
+    }
+
+    save(varRef: VariableReference, value: string) {
+      return this.getScope(varRef.scope).save(varRef, value);
     }
 
     subscribe(callback: () => void): Disposable {
-      let disposables = this.states.entries().map((state) => state.subscribe(callback));
+      let stateCollections = Object.keys(this.stateScopes).map((key) => this.stateScopes[key]);
+      let subscribeToAll = (stateCollection) => stateCollection.all.map((state) => state.subscribe(callback));
+      let disposables = [].concat(stateCollections.map(subscribeToAll));
       return {
         dispose: () => disposables.forEach((item) => item.dispose())
       }

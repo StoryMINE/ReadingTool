@@ -40,7 +40,7 @@ import {StoryConnector} from "../store/StoryConnector";
 import {ReadingConnector} from "../store/ReadingConnector";
 import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
-import {CompositeState} from "../utilities/CompositeState";
+import {CompositeScope} from "../utilities/CompositeScope";
 
 @autoinject()
 export class ReadingManager {
@@ -110,8 +110,8 @@ export class ReadingManager {
         }
     }
 
-    private getVariableAccessor(): CompositeState {
-      return new CompositeState({global: this.story.globalStates, shared: this.reading.sharedStates})
+    private getVariableAccessor(): CompositeScope {
+      return new CompositeScope({global: this.story.globalStates, shared: this.reading.sharedStates})
     }
 
     private updateStatus() {

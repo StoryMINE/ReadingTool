@@ -4,12 +4,11 @@
  *
  This application was developed as part of the Leverhulme Trust funded
  StoryPlaces Project. For more information, please visit storyplaces.soton.ac.uk
- Copyright (c) 2018
+ Copyright (c) 2016
  University of Southampton
  Charlie Hargood, cah07r.ecs.soton.ac.uk
  Kevin Puplett, k.e.puplett.soton.ac.uk
  David Pepper, d.pepper.soton.ac.uk
- Callum Spawforth, cs14g13@soton.ac.uk
 
  All rights reserved.
  Redistribution and use in source and binary forms, with or without
@@ -33,15 +32,55 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import {Factory, inject} from "aurelia-framework";
+import {BaseModel} from "./BaseModel";
+import {TypeChecker} from "../utilities/TypeChecker";
+import {StateCollection} from "../collections/StateCollection";
+import {VariableAccessor} from "../interfaces/VariableAccessor";
+import {VariableReference} from "./VariableReference";
+import {Variable} from "./Variable";
 
-import {VariableReference} from "../models/VariableReference";
-import {Variable} from "../models/Variable";
+@inject(Factory.of(StateCollection),
+        TypeChecker)
+export class VariableScope extends BaseModel implements VariableAccessor {
 
-/*
-By using this, it allows us to change how all of the Conditions and Functions access their variables.
-This was introduced to allow for variables to be contained in multiple places using CompositeScope.
- */
-export interface VariableAccessor {
-    get(key: VariableReference): Variable;
-    save(key: VariableReference, value: string);
+  private states: StateCollection;
+
+  constructor(private stateCollectionFactory: (any?) => StateCollection,
+              typeChecker: TypeChecker,
+              data?: any) {
+    super(typeChecker);
+    this.fromObject(data);
+  }
+
+  fromObject(data: any = []) {
+    this.typeChecker.isArrayOf("Variable Scope States", data, "object");
+    this.states = this.stateCollectionFactory(data);
+  }
+
+  toJSON() {
+    return this.states.toJSON();
+  }
+
+  get(varRef: VariableReference): Variable {
+    let state = this.states.get(varRef.namespace);
+    //It's valid to access a state that hasn't been created - it's an empty state.
+    if(!state) { return null; }
+    return state.get(varRef);
+  }
+
+  save(varRef: VariableReference, value: string) {
+    let state = this.states.get(varRef.namespace);
+    if(!state) {
+      this.states.save({
+        id: varRef.namespace,
+        variables: [{
+          id: varRef.variable,
+          value: value
+        }]
+      })
+    } else {
+      state.save(varRef, value);
+    }
+  }
 }

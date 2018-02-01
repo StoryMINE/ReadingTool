@@ -36,22 +36,22 @@ import {Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {ReaderCollection} from "../collections/ReaderCollection";
-import {StateCollection} from "../collections/StateCollection";
+import {VariableScope} from "./VariableScope";
 
 @inject(Factory.of(ReaderCollection),
-        Factory.of(StateCollection),
+        Factory.of(VariableScope),
         TypeChecker)
 export class Reading extends BaseModel {
 
     private _name: string;
     private _storyId: string;
     private _readers: ReaderCollection;
-    private _sharedStates: StateCollection;
+    private _sharedStates: VariableScope;
     private _state: string;
     private _timestamp: number;
 
     constructor(private readerCollectionFactory: (any?) => ReaderCollection,
-                private stateCollectionFactory: (any?) => StateCollection,
+                private variableScopeFactory: (any?) => VariableScope,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
@@ -63,7 +63,7 @@ export class Reading extends BaseModel {
         this.name = data.name;
         this.storyId = data.storyId;
         this.readers = this.readerCollectionFactory(data.readers);
-        this.sharedStates = this.stateCollectionFactory(data.sharedStates);
+        this.sharedStates = this.variableScopeFactory(data.sharedStates);
         this.state = (data.state || "notstarted");
         this.timestamp = data.timestamp;
     }
@@ -128,12 +128,12 @@ export class Reading extends BaseModel {
         this._readers = value;
     }
 
-    get sharedStates(): StateCollection {
+    get sharedStates(): VariableScope {
       return this._sharedStates;
     }
 
-    set sharedStates(value: StateCollection) {
-      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "StateCollection", StateCollection);
+    set sharedStates(value: VariableScope) {
+      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "VariableScope", VariableScope);
       this._sharedStates = value;
     }
 

@@ -42,7 +42,7 @@ import {LocationCollection} from "../collections/LocationCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {RoleCollection} from "../collections/RoleCollection";
-import {StateCollection} from "../collections/StateCollection";
+import {VariableScope} from "./VariableScope";
 
 @inject(
     Factory.of(PageCollection),
@@ -52,7 +52,7 @@ import {StateCollection} from "../collections/StateCollection";
     Factory.of(FunctionCollection),
     Factory.of(ConditionCollection),
     Factory.of(StoryOptions),
-    Factory.of(StateCollection),
+    Factory.of(VariableScope),
     TypeChecker
 )
 export class Story extends BaseModel {
@@ -71,7 +71,7 @@ export class Story extends BaseModel {
     private _locations: LocationCollection;
     private _publishState: string;
     private _storyOptions: StoryOptions;
-    private _globalStates: StateCollection;
+    private _globalStates: VariableScope;
 
     constructor(private pageCollectionFactory: (any?) => PageCollection,
                 private roleCollectionFactory: (any?) => RoleCollection,
@@ -80,7 +80,7 @@ export class Story extends BaseModel {
                 private functionCollectionFactory: (any?) => FunctionCollection,
                 private conditionCollectionFactory: (any?) => ConditionCollection,
                 private storyOptionsFactory: (any?) => StoryOptions,
-                private stateCollectionFactory: (any?) => StateCollection,
+                private variableScopeFactory: (any?) => VariableScope,
                 typeChecker: TypeChecker,
                 data?: any) {
         super(typeChecker);
@@ -121,7 +121,7 @@ export class Story extends BaseModel {
         this.publishState = data.publishState;
         this.storyOptions = this.storyOptionsFactory(data.storyOptions);
         this.roles = this.roleCollectionFactory(data.roles);
-        this.globalStates = this.stateCollectionFactory(data.globalStates);
+        this.globalStates = this.variableScopeFactory(data.globalStates);
     }
 
     public toJSON() {
@@ -270,12 +270,12 @@ export class Story extends BaseModel {
         this._roles = value;
     }
 
-    get globalStates(): StateCollection {
+    get globalStates(): VariableScope {
       return this._globalStates;
     }
 
-    set globalStates(value: StateCollection) {
-      this.typeChecker.validateAsObjectOrUndefined("GlobalStates", value, "StateCollection", StateCollection);
+    set globalStates(value: VariableScope) {
+      this.typeChecker.validateAsObjectOrUndefined("GlobalStates", value, "VariableScope", VariableScope);
       this._globalStates = value;
     }
 
