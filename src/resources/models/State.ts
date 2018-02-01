@@ -46,10 +46,11 @@ import {VariableObserver} from "../interfaces/VariableObserver";
         TypeChecker)
 export class State extends BaseModel implements VariableAccessor, VariableObserver {
 
-    private _bindingEngine: BindingEngine;
     private _variables: VariableCollection;
 
-    constructor(private variableCollectionFactory: (any?) => VariableCollection, typeChecker: TypeChecker, data?: any) {
+    constructor(private variableCollectionFactory: (any?) => VariableCollection,
+                private bindingEngine: BindingEngine,
+                typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
     }
@@ -92,6 +93,6 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
     }
 
     subscribe(callback: () => void): Disposable {
-        return this._bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
+        return this.bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
     }
 }
