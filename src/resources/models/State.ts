@@ -33,17 +33,18 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {VariableCollection} from "../collections/VariableCollection";
-import {inject, BindingEngine, Factory, PropertyObserver} from "aurelia-framework";
+import {inject, BindingEngine, Factory, Disposable} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "./VariableReference";
 import {Variable} from "./Variable";
+import {VariableObserver} from "../interfaces/VariableObserver";
 
 @inject(Factory.of(VariableCollection),
         BindingEngine,
         TypeChecker)
-export class State extends BaseModel implements VariableAccessor {
+export class State extends BaseModel implements VariableAccessor, VariableObserver {
 
     private _bindingEngine: BindingEngine;
     private _variables: VariableCollection;
@@ -90,7 +91,7 @@ export class State extends BaseModel implements VariableAccessor {
       this.variables.save(variable);
     }
 
-    subscribe(callback: () => void) {
-        this._bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
+    subscribe(callback: () => void): Disposable {
+        return this._bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
     }
 }

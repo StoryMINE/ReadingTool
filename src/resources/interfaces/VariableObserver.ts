@@ -4,11 +4,12 @@
  *
  This application was developed as part of the Leverhulme Trust funded
  StoryPlaces Project. For more information, please visit storyplaces.soton.ac.uk
- Copyright (c) 2016
+ Copyright (c) 2018
  University of Southampton
  Charlie Hargood, cah07r.ecs.soton.ac.uk
  Kevin Puplett, k.e.puplett.soton.ac.uk
  David Pepper, d.pepper.soton.ac.uk
+ Callum Spawforth, cs14g13@soton.ac.uk
 
  All rights reserved.
  Redistribution and use in source and binary forms, with or without
@@ -32,60 +33,23 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import {Disposable, Factory, inject} from "aurelia-framework";
-import {BaseModel} from "./BaseModel";
-import {TypeChecker} from "../utilities/TypeChecker";
-import {StateCollection} from "../collections/StateCollection";
-import {VariableAccessor} from "../interfaces/VariableAccessor";
-import {VariableReference} from "./VariableReference";
-import {Variable} from "./Variable";
-import {multiSubscribe, VariableObserverCallback} from "../interfaces/VariableObserver";
 
-@inject(Factory.of(StateCollection),
-        TypeChecker)
-export class VariableScope extends BaseModel implements VariableAccessor, VariableScope {
+import {Disposable} from "aurelia-framework/dist/aurelia-framework";
 
-  private states: StateCollection;
+export type VariableObserverCallback = () => void;
 
-  constructor(private stateCollectionFactory: (any?) => StateCollection,
-              typeChecker: TypeChecker,
-              data?: any) {
-    super(typeChecker);
-    this.fromObject(data);
-  }
+export interface VariableObserver {
+  subscribe(callback: VariableObserverCallback): Disposable;
+}
 
-  fromObject(data: any = []) {
-    this.typeChecker.isArrayOf("Variable Scope States", data, "object");
-    this.states = this.stateCollectionFactory(data);
-  }
-
-  toJSON() {
-    return this.states.toJSON();
-  }
-
-  get(varRef: VariableReference): Variable {
-    let state = this.states.get(varRef.namespace);
-    //It's valid to access a state that hasn't been created - it's an empty state.
-    if(!state) { return null; }
-    return state.get(varRef);
-  }
-
-  save(varRef: VariableReference, value: string) {
-    let state = this.states.get(varRef.namespace);
-    if(!state) {
-      this.states.save({
-        id: varRef.namespace,
-        variables: [{
-          id: varRef.variable,
-          value: value
-        }]
-      })
-    } else {
-      state.save(varRef, value);
+export function multiSubscribe(observers: Array<VariableObserver>,
+                              callback: VariableObserverCallback): Disposable {
+  let disposables = observers.map((observer: VariableObserver) =>
+    observer.subscribe(callback)
+  );
+  return {
+    dispose: () => {
+      disposables.forEach((disposable: Disposable) => disposable.dispose());
     }
-  }
-
-  subscribe(callback: VariableObserverCallback): Disposable {
-    return multiSubscribe(this.states.all, callback);
   }
 }
