@@ -79,7 +79,7 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
 
     get(varRef: VariableReference): Variable {
       if(this.id != varRef.namespace) {
-        return null;
+        return undefined;
       }
       return this.variables.get(varRef.variable);
     }

@@ -169,11 +169,11 @@ describe("ConditionCollection", () => {
 
     it("generates the correct Condition for the supplied type", () => {
         let collection = resolve(ConditionCollection, [
-            {id: "check-condition", type: "check", variable:"a"},
+            {id: "check-condition", type: "check", variable: {id: "a", namespace:"a", scope:"shared"}},
             {id: "comparison-condition", type: "comparison", aType: "String", a: "a", bType: "String", b: "b"},
             {id: "location-condition", type: "location", bool:"true", location:"a"},
             {id: "logical-condition", type: "logical", operand:"AND", conditions:[]},
-            {id: "timepassed-condition", type: "timepassed", variable:"a", minutes:1},
+            {id: "timepassed-condition", type: "timepassed", variable:{id: "a", namespace:"a", scope:"shared"}, minutes:1},
             {id: "timerange-condition", type: "timerange", start:"11:11", end: "22:22"}
         ]);
 

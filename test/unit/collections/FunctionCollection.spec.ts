@@ -164,10 +164,11 @@ describe("FunctionCollection", () => {
     });
 
     it("generates the correct Function for the supplied type", () => {
+        let test_variable = {id: "a", namespace:"a", scope:"shared"};
         let collection = resolve(FunctionCollection, [
-            {id: "set-function", type: "set", variable: "a", value: "a"},
-            {id: "settimestamp-function", type: "settimestamp", variable: "a"},
-            {id: "increment-function", type: "increment", variable: "a", value: "a"},
+            {id: "set-function", type: "set", variable: test_variable, value: "a"},
+            {id: "settimestamp-function", type: "settimestamp", variable: test_variable},
+            {id: "increment-function", type: "increment", variable: test_variable, value: "a"},
         ]);
 
         expect(collection.get("set-function") instanceof SetFunction).toEqual(true);

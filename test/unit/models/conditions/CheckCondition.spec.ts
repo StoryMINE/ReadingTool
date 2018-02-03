@@ -40,13 +40,17 @@ import {Container} from "aurelia-framework";
 import {ConditionCollection} from "../../../../src/resources/collections/ConditionCollection";
 import {LocationInformation} from "../../../../src/resources/gps/LocationInformation";
 import {LocationCollection} from "../../../../src/resources/collections/LocationCollection";
+import {VariableReference} from "../../../../src/resources/models/VariableReference";
+import {Factory} from "aurelia-dependency-injection/dist/aurelia-dependency-injection";
+import {State} from "../../../../src/resources/models/State";
 
 describe("CheckCondition", () => {
 
     let typeChecker = new TypeChecker;
+    let container;
 
     beforeEach(() => {
-
+      container = new Container();
     });
 
     afterEach(() => {
@@ -54,20 +58,20 @@ describe("CheckCondition", () => {
     });
 
     it("can be created with no data", () => {
-        let checkCondition = new CheckCondition(typeChecker);
+        let checkCondition = container.invoke(CheckCondition);
 
         expect(checkCondition instanceof CheckCondition).toBeTruthy();
     });
 
     it("can be created with data", () => {
-        let checkCondition = new CheckCondition(typeChecker, {});
+      let checkCondition = container.invoke(CheckCondition);
 
         expect(checkCondition instanceof CheckCondition).toBeTruthy();
     });
 
 
     it("will throw an error if something other than an object is passed to fromObject", () => {
-        let model = new CheckCondition(typeChecker);
+        let model = container.invoke(CheckCondition);
 
         expect(() => {
             model.fromObject([] as any)
@@ -80,15 +84,16 @@ describe("CheckCondition", () => {
 
     //region variable
 
-    it("can have variable set as a string", () => {
-        let checkCondition = new CheckCondition(typeChecker);
-        checkCondition.variable = "value";
+    it("can have variable set as a Variable Reference", () => {
+        let checkCondition = container.invoke(CheckCondition, [{id: "a", variable: {id: "a", scope: "shared", namespace: "a"}}]);
+        let varRef = container.invoke(VariableReference, [{id: "b", scope: "shared", namespace: "b"}]);
+        checkCondition.variable = varRef;
 
-        expect(checkCondition.variable).toEqual("value");
+        expect(checkCondition.variable).toEqual(varRef);
     });
 
-    it("will throw an error if the a variable is not a string", () => {
-        let checkCondition = new CheckCondition(typeChecker);
+    it("will throw an error if the a variable is not a a Variable Reference", () => {
+        let checkCondition = container.invoke(CheckCondition);
         expect(() => {
             checkCondition.variable = 1 as any;
         }).toThrow();
@@ -96,18 +101,28 @@ describe("CheckCondition", () => {
     //region
 
     describe("method execute", () => {
-        let container: Container = new Container().makeGlobal();
-        let variables = container.invoke(VariableCollection, [[{id: "TestVariable", value:"something"}, {id: "NotTheTestVariable", value:"something"}]]);
+        let localContainer: Container;
+        let state: State;
+        let existingVarRef = {id:"TestVariable", variable: "TestVariable",  namespace: "a", scope:"shared"};
+        let nonExistingVarRef = {id:"MysteryVariable", variable: "MysteryVariable", namespace: "a", scope:"shared"};
+
+        beforeEach(() => {
+          localContainer = new Container().makeGlobal();
+          state = localContainer.invoke(State, [{id: "a", variables:[{id: "TestVariable", value:"something"}, {id: "NotTheTestVariable", value:"something"}]}]);
+        });
 
         it("returns true if the variable exists", () => {
-            let checkCondition = new CheckCondition(typeChecker, {id: "test", variable: "TestVariable"});
-            let result = checkCondition.execute(variables, {} as ConditionCollection, {} as LocationCollection, {} as LocationInformation);
+            let checkCondition = localContainer.invoke(CheckCondition, [{id: "TestCheck", variable: existingVarRef}]);
+
+            let result = checkCondition.execute(state, {} as ConditionCollection, {} as LocationCollection, {} as LocationInformation);
             expect(result).toBeTruthy();
         });
 
         it("returns false if the variable doesn't exist", () => {
-            let checkCondition = new CheckCondition(typeChecker, {id: "test", variable: "SomethingElse"});
-            let result = checkCondition.execute(variables, {} as ConditionCollection, {} as LocationCollection, {} as LocationInformation);
+            let checkCondition = localContainer.invoke(CheckCondition, [{id: "TestCheck", variable: nonExistingVarRef}]);
+
+            let result = checkCondition.execute(state, {} as ConditionCollection, {} as LocationCollection, {} as LocationInformation);
+            console.log(result);
             expect(result).toBeFalsy();
         });
     });

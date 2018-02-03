@@ -34,10 +34,13 @@
  */
 import {Reading} from "../../../src/resources/models/Reading";
 import {TypeChecker} from "../../../src/resources/utilities/TypeChecker";
+import {ReaderCollection} from "../../../src/resources/collections/ReaderCollection";
 
 describe("Reading model", () => {
     let factoryCalledWith;
     let typeChecker;
+
+    let exampleReadingObj;
 
     let factory = (data) => {
         factoryCalledWith = data;
@@ -47,6 +50,14 @@ describe("Reading model", () => {
     beforeEach(() => {
         factoryCalledWith = "set to something random";
         typeChecker = new TypeChecker;
+        exampleReadingObj = {
+          id: "1",
+          storyId: "story",
+          readers: [],
+          sharedStates: [{
+            id: "TestState",
+            variables: []
+          }]};
     });
 
     afterEach(() => {
@@ -54,36 +65,37 @@ describe("Reading model", () => {
     });
 
     it("can be instantiated with no data", () => {
-        let model = new Reading(factory, typeChecker);
+        let model = new Reading(factory, factory, typeChecker);
 
         expect(model.id).toBeUndefined();
         expect(model.storyId).toBeUndefined();
-        expect(model.userId).toBeUndefined();
         expect(factoryCalledWith).toBeUndefined();
     });
 
     it("can be instantiated with data", () => {
-        let model = new Reading(factory, typeChecker, {id: "1", storyId: "story", userId: "user", variables: [{id: "2"}]});
+        let model = new Reading(factory, factory, typeChecker, exampleReadingObj);
 
         expect(model.id).toEqual("1");
         expect(model.storyId).toEqual("story");
-        expect(model.userId).toEqual("user");
-        expect(factoryCalledWith).toEqual([{id: "2"}]);
+        expect(model.readers).toBeUndefined();
+        expect(model.sharedStates).toBeUndefined();
+        expect(factoryCalledWith).toEqual(exampleReadingObj.sharedStates);
     });
 
     it("can have an anonymous object passed to it", () => {
-        let model = new Reading(factory, typeChecker);
+        let model = new Reading(factory, factory, typeChecker);
 
-        model.fromObject({id: "1", storyId: "story", userId: "user", variables: [{id: "2"}]});
+        model.fromObject(exampleReadingObj);
 
         expect(model.id).toEqual("1");
         expect(model.storyId).toEqual("story");
-        expect(model.userId).toEqual("user");
-        expect(factoryCalledWith).toEqual([{id: "2"}]);
+        expect(model.readers).toBeUndefined();
+        expect(model.sharedStates).toBeUndefined();
+        expect(factoryCalledWith).toEqual(exampleReadingObj.sharedStates);
     });
 
     it("will throw an error if something other than an object is passed to fromObject", () => {
-        let model = new Reading(factory, typeChecker);
+        let model = new Reading(factory, factory, typeChecker);
 
         expect(() => {
             model.fromObject([] as any)
@@ -96,59 +108,59 @@ describe("Reading model", () => {
 
 
     it("will throw an error when readingId is set to something other than a string or undefined", () => {
-        let model = new Reading(factory, typeChecker);
+        let model = new Reading(factory, factory, typeChecker);
         expect(() => {
             model.id = 1 as any
         }).toThrow();
     });
 
-    it("will throw an error when userId is set to something other than a string or undefined", () => {
-        let model = new Reading(factory, typeChecker);
+    it("will throw an error when readers is set to something other than a ReaderCollection or undefined", () => {
+        let model = new Reading(factory, factory, typeChecker);
 
         expect(() => {
-            model.userId = 1 as any
+            model.readers = 1 as any;
         }).toThrow();
     });
 
     describe("variable state", () => {
         it("can be set to notstarted", () => {
-            let model = new Reading(factory, typeChecker);
+            let model = new Reading(factory, factory, typeChecker);
             model.state = "notstarted";
             expect(model.state).toEqual("notstarted");
         });
 
         it("can be set to inprogress", () => {
-            let model = new Reading(factory, typeChecker);
+            let model = new Reading(factory, factory, typeChecker);
             model.state = "inprogress";
             expect(model.state).toEqual("inprogress");
         });
 
         it("can be set to finished", () => {
-            let model = new Reading(factory, typeChecker);
+            let model = new Reading(factory, factory, typeChecker);
             model.state = "closed";
             expect(model.state).toEqual("closed");
         });
 
         it("will throw when set to something else", () => {
-            let model = new Reading(factory, typeChecker);
+            let model = new Reading(factory, factory, typeChecker);
             expect(() => {model.state = "something random";}).toThrow();
         });
     });
 
-    it("will throw an error when variables is set to something other than an instance of VariableCollection", () => {
-        let model = new Reading(factory, typeChecker);
+    it("will throw an error when sharedStates is set to something other than an instance of VariableScope", () => {
+        let model = new Reading(factory, factory, typeChecker);
 
         expect(() => {
-            model.variables = 1 as any
+            model.sharedStates = 1 as any
         }).toThrow();
     });
 
     it("can be cast to JSON", () => {
-        let model = new Reading(factory, typeChecker, {id: "1", storyId: "reading", userId: "user", variables: [{id: "2"}]});
+        let model = new Reading(factory, factory, typeChecker, exampleReadingObj);
 
         let result = JSON.stringify(model);
 
         //TODO: Make this a better test as variables is missed off
-        expect(result).toEqual('{"id":"1","storyId":"reading","userId":"user","state":"notstarted"}');
+        expect(result).toEqual('{"id":"1","storyId":"story","state":"notstarted"}');
     });
 });
