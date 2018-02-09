@@ -33,7 +33,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {VariableCollection} from "../collections/VariableCollection";
-import {inject, BindingEngine, Factory, Disposable} from "aurelia-framework";
+import {Disposable, Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
@@ -42,14 +42,13 @@ import {Variable} from "./Variable";
 import {VariableObserver} from "../interfaces/VariableObserver";
 
 @inject(Factory.of(VariableCollection),
-        BindingEngine,
         TypeChecker)
 export class State extends BaseModel implements VariableAccessor, VariableObserver {
 
     private _variables: VariableCollection;
+    private observers: Set<Function>;
 
     constructor(private variableCollectionFactory: (any?) => VariableCollection,
-                private bindingEngine: BindingEngine,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
@@ -59,6 +58,7 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
         this.variables = this.variableCollectionFactory(data.variables);
+        this.observers = new Set();
     }
 
     toJSON() {
@@ -90,9 +90,19 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
       }
       let variable = {id: varRef.variable, value: value};
       this.variables.save(variable);
+      this.notify();
     }
 
     subscribe(callback: () => void): Disposable {
-        return this.bindingEngine.collectionObserver(this.variables.all).subscribe(callback);
+        this.observers.add(callback);
+        return {
+          dispose: () => {
+            this.observers.delete(callback);
+          }
+        };
+    }
+
+    private notify() {
+      this.observers.forEach(Function.call);
     }
 }
