@@ -75,6 +75,7 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
     set variables(value: VariableCollection) {
         this.typeChecker.validateAsObjectOrUndefined("Variables", value, "VariableCollection", VariableCollection);
         this._variables = value;
+        this.notify();
     }
 
     get(varRef: VariableReference): Variable {
