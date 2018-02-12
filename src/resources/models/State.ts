@@ -56,9 +56,9 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
 
     fromObject(data: any = {id: undefined, variables: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
+        this.observers = new Set();
         this.id = data.id;
         this.variables = this.variableCollectionFactory(data.variables);
-        this.observers = new Set();
     }
 
     toJSON() {
