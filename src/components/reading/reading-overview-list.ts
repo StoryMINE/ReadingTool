@@ -68,7 +68,11 @@ export class ReadingOverviewListCustomElement {
 
     newReading() {
         var readingName = "Reading " + (this.readings.length + 1);
-        var reading = this.readingFactory({storyId: this.storyId, userId: this.auth.userId, name: readingName});
+        var reading = this.readingFactory({
+          storyId: this.storyId,
+          readers: [{id: this.auth.userId, roleName: this.storyCollection.get(this.storyId).roles[0]}],
+          name: readingName
+        });
         this.readingConnector.save(reading);
         this.loggingHelper.logNewReading(this.storyCollection.get(this.storyId));
         this.refresh();
