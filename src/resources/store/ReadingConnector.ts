@@ -6,6 +6,7 @@ import {ReadingAPI} from "./ReadingAPI";
 import {ReadingCollection} from "../collections/ReadingCollection";
 
 import moment = require('moment');
+import {ScopedStates} from "../interfaces/ScopedStates";
 /**
  * Created by andy on 09/12/16.
  */
@@ -82,5 +83,13 @@ export class ReadingConnector extends AbstractConnector<Reading> {
 
     byStoryId(storyId: string): Array<Reading> {
         return this.all.filter(reading => reading.storyId == storyId);
+    }
+
+    getStates(readingId: string): Promise<ScopedStates> {
+        return this.storyplacesAPI.getStates(readingId)
+          .then((response) => response.json())
+          .then((states) => {
+            return states;
+          });
     }
 }
