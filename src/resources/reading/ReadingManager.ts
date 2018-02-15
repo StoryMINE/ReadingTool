@@ -41,6 +41,7 @@ import {ReadingConnector} from "../store/ReadingConnector";
 import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {CompositeScope} from "../utilities/CompositeScope";
+import {Subscription} from "../interfaces/Subscription";
 
 @autoinject()
 export class ReadingManager {
@@ -48,9 +49,12 @@ export class ReadingManager {
     story: Story;
     reading: Reading;
 
-    private variableSub: Disposable;
+    updateInterval: number = 500;
+
+    private variableSub: Subscription;
     private locationSub: Disposable;
     private timeSub: number;
+    private stateUpdateSub: number;
 
     viewablePages: Array<Page>;
 
@@ -72,6 +76,7 @@ export class ReadingManager {
                 if (withUpdates) {
                     this.attachListeners();
                     this.updateStatus();
+                    this.beginUpdatePolling();
                 }
                 // Start the reading if it has not already been started.
                 if (this.reading.state == "notstarted") {
@@ -84,7 +89,24 @@ export class ReadingManager {
     detach() {
         this.reading = undefined;
         this.story = undefined;
+        this.stopUpdatePolling();
         this.detachListeners();
+    }
+
+    private beginUpdatePolling() {
+      this.stateUpdateSub = window.setInterval(() => {
+        this.readingConnector.getStates(this.reading.id).then((states) => {
+          this.detachListeners();
+          this.story.globalStates = states.global;
+          this.reading.sharedStates = states.shared;
+          this.attachListeners();
+          this.variableSub.notify();
+        });
+      }, this.updateInterval);
+    }
+
+    private stopUpdatePolling() {
+      window.clearInterval(this.stateUpdateSub);
     }
 
     private attachListeners() {
