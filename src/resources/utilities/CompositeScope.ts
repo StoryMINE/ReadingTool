@@ -36,11 +36,11 @@
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
-import {Disposable} from "aurelia-framework";
 import {VariableScope} from "../models/VariableScope";
-import {multiSubscribe, VariableObserver, VariableObserverCallback} from "../interfaces/VariableObserver";
+import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
+import {CompositeSubscription} from "./Subscription";
 
-export class CompositeScope implements VariableAccessor, VariableObserver {
+export class CompositeScope implements VariableAccessor, Subscribable {
 
     constructor(private stateScopes: {[scopeName: string]: VariableScope}) {
     }
@@ -61,9 +61,9 @@ export class CompositeScope implements VariableAccessor, VariableObserver {
       return this.getScope(varRef.scope).save(varRef, value);
     }
 
-    subscribe(callback: VariableObserverCallback): Disposable {
+    subscribe(callback: NotifyCallback): Subscription {
       let scopes = Object.keys(this.stateScopes).map((key) => this.stateScopes[key]);
-      return multiSubscribe(scopes, callback);
+      return new CompositeSubscription(callback, scopes);
     }
 
 }

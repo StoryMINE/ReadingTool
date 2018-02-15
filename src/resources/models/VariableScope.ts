@@ -32,18 +32,19 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import {Disposable, Factory, inject} from "aurelia-framework";
+import {Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {StateCollection} from "../collections/StateCollection";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "./VariableReference";
 import {Variable} from "./Variable";
-import {multiSubscribe, VariableObserverCallback} from "../interfaces/VariableObserver";
+import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
+import {CompositeSubscription} from "../utilities/Subscription";
 
 @inject(Factory.of(StateCollection),
         TypeChecker)
-export class VariableScope extends BaseModel implements VariableAccessor, VariableScope {
+export class VariableScope extends BaseModel implements VariableAccessor, Subscribable {
 
   private states: StateCollection;
 
@@ -85,7 +86,7 @@ export class VariableScope extends BaseModel implements VariableAccessor, Variab
     }
   }
 
-  subscribe(callback: VariableObserverCallback): Disposable {
-    return multiSubscribe(this.states.all, callback);
+  subscribe(callback: NotifyCallback): Subscription {
+    return new CompositeSubscription(callback, this.states.all);
   }
 }

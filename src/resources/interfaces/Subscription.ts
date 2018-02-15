@@ -34,22 +34,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {Disposable} from "aurelia-framework/dist/aurelia-framework";
+export type NotifyCallback = () => void;
 
-export type VariableObserverCallback = () => void;
-
-export interface VariableObserver {
-  subscribe(callback: VariableObserverCallback): Disposable;
+export interface Subscribable {
+  subscribe(callback: NotifyCallback): Subscription;
 }
 
-export function multiSubscribe(observers: Array<VariableObserver>,
-                              callback: VariableObserverCallback): Disposable {
-  let disposables = observers.map((observer: VariableObserver) =>
-    observer.subscribe(callback)
-  );
-  return {
-    dispose: () => {
-      disposables.forEach((disposable: Disposable) => disposable.dispose());
-    }
-  }
+export interface Subscription {
+  dispose();
+  notify();
+  paused: boolean;
 }

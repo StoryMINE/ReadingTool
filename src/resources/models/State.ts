@@ -39,16 +39,17 @@ import {TypeChecker} from "../utilities/TypeChecker";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "./VariableReference";
 import {Variable} from "./Variable";
-import {VariableObserver} from "../interfaces/VariableObserver";
+import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
+import {SimpleSubscriptionService} from "../utilities/Subscription";
 
 @inject(Factory.of(VariableCollection),
         TypeChecker)
-export class State extends BaseModel implements VariableAccessor, VariableObserver {
+export class State extends BaseModel implements VariableAccessor, Subscribable {
 
-    private _variables: VariableCollection;
-    private observers: Set<Function>;
+  private _variables: VariableCollection;
+  private subscriptionService: SimpleSubscriptionService;
 
-    constructor(private variableCollectionFactory: (any?) => VariableCollection,
+  constructor(private variableCollectionFactory: (any?) => VariableCollection,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
@@ -56,8 +57,8 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
 
     fromObject(data: any = {id: undefined, variables: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
-        this.observers = new Set();
-        this.id = data.id;
+        this.subscriptionService = new SimpleSubscriptionService();
+         this.id = data.id;
         this.variables = this.variableCollectionFactory(data.variables);
     }
 
@@ -75,7 +76,7 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
     set variables(value: VariableCollection) {
         this.typeChecker.validateAsObjectOrUndefined("Variables", value, "VariableCollection", VariableCollection);
         this._variables = value;
-        this.notify();
+        this.subscriptionService.notify();
     }
 
     get(varRef: VariableReference): Variable {
@@ -91,19 +92,10 @@ export class State extends BaseModel implements VariableAccessor, VariableObserv
       }
       let variable = {id: varRef.variable, value: value};
       this.variables.save(variable);
-      this.notify();
+      this.subscriptionService.notify();
     }
 
-    subscribe(callback: () => void): Disposable {
-        this.observers.add(callback);
-        return {
-          dispose: () => {
-            this.observers.delete(callback);
-          }
-        };
-    }
-
-    private notify() {
-      this.observers.forEach(Function.call);
-    }
+  subscribe(callback: NotifyCallback): Subscription {
+    return this.subscriptionService.subscribe(callback);
+  }
 }
