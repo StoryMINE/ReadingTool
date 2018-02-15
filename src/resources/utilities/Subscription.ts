@@ -1,7 +1,7 @@
 
 export class SimpleSubscriptionService implements Subscribable {
 
-  private observers: Set<Subscription>;
+  private observers: Set<Subscription> = new Set();
 
   subscribe(callback: NotifyCallback): Subscription {
     let disposalCallback = this.unsubscribe.bind(this);
