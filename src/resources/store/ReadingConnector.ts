@@ -1,5 +1,5 @@
 import {AbstractConnector} from "./AbstractConnector";
-import {inject, NewInstance, computedFrom} from 'aurelia-framework';
+import {inject, NewInstance, computedFrom, Factory} from 'aurelia-framework';
 import {Reading} from "../models/Reading";
 import {ReadingAPI} from "./ReadingAPI";
 
@@ -7,14 +7,20 @@ import {ReadingCollection} from "../collections/ReadingCollection";
 
 import moment = require('moment');
 import {ScopedStates} from "../interfaces/ScopedStates";
+import {Variable} from "../models/Variable";
+import {VariableScope} from "../models/VariableScope";
 /**
  * Created by andy on 09/12/16.
  */
 
-@inject(ReadingCollection, NewInstance.of(ReadingAPI))
+@inject(ReadingCollection,
+        NewInstance.of(ReadingAPI),
+        Factory.of(VariableScope))
 export class ReadingConnector extends AbstractConnector<Reading> {
 
-    constructor(private readingCollection : ReadingCollection, private storyplacesAPI: ReadingAPI){
+    constructor(private readingCollection : ReadingCollection,
+                private storyplacesAPI: ReadingAPI,
+                private variableScopeFactory: (any?) => VariableScope) {
         super();
         this.storyplacesAPI.path = "/reading/";
     }
@@ -88,8 +94,11 @@ export class ReadingConnector extends AbstractConnector<Reading> {
     getStates(readingId: string): Promise<ScopedStates> {
         return this.storyplacesAPI.getStates(readingId)
           .then((response) => response.json())
-          .then((states) => {
-            return states;
+          .then((states: ScopedStates) => {
+            return {
+              global: this.variableScopeFactory(states.global),
+              shared: this.variableScopeFactory(states.shared)
+            };
           });
     }
 }
