@@ -1,6 +1,6 @@
-import {VariableScope} from "../models/VariableScope";
+import {StateScope} from "../models/VariableScope";
 
 export interface ScopedStates {
-  global: VariableScope,
-  shared: VariableScope
+  global: StateScope,
+  shared: StateScope
 }

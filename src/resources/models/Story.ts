@@ -42,7 +42,7 @@ import {LocationCollection} from "../collections/LocationCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {RoleCollection} from "../collections/RoleCollection";
-import {VariableScope} from "./VariableScope";
+import {StateScope} from "./VariableScope";
 
 @inject(
     Factory.of(PageCollection),
@@ -52,7 +52,7 @@ import {VariableScope} from "./VariableScope";
     Factory.of(FunctionCollection),
     Factory.of(ConditionCollection),
     Factory.of(StoryOptions),
-    Factory.of(VariableScope),
+    Factory.of(StateScope),
     TypeChecker
 )
 export class Story extends BaseModel {
@@ -71,7 +71,7 @@ export class Story extends BaseModel {
     private _locations: LocationCollection;
     private _publishState: string;
     private _storyOptions: StoryOptions;
-    private _globalStates: VariableScope;
+    private _globalStates: StateScope;
 
     constructor(private pageCollectionFactory: (any?) => PageCollection,
                 private roleCollectionFactory: (any?) => RoleCollection,
@@ -80,7 +80,7 @@ export class Story extends BaseModel {
                 private functionCollectionFactory: (any?) => FunctionCollection,
                 private conditionCollectionFactory: (any?) => ConditionCollection,
                 private storyOptionsFactory: (any?) => StoryOptions,
-                private variableScopeFactory: (any?) => VariableScope,
+                private variableScopeFactory: (any?) => StateScope,
                 typeChecker: TypeChecker,
                 data?: any) {
         super(typeChecker);
@@ -270,12 +270,12 @@ export class Story extends BaseModel {
         this._roles = value;
     }
 
-    get globalStates(): VariableScope {
+    get globalStates(): StateScope {
       return this._globalStates;
     }
 
-    set globalStates(value: VariableScope) {
-      this.typeChecker.validateAsObjectOrUndefined("GlobalStates", value, "VariableScope", VariableScope);
+    set globalStates(value: StateScope) {
+      this.typeChecker.validateAsObjectOrUndefined("GlobalStates", value, "StateScope", StateScope);
       this._globalStates = value;
     }
 

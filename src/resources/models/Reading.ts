@@ -36,22 +36,22 @@ import {Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {ReaderCollection} from "../collections/ReaderCollection";
-import {VariableScope} from "./VariableScope";
+import {StateScope} from "./VariableScope";
 
 @inject(Factory.of(ReaderCollection),
-        Factory.of(VariableScope),
+        Factory.of(StateScope),
         TypeChecker)
 export class Reading extends BaseModel {
 
     private _name: string;
     private _storyId: string;
     private _readers: ReaderCollection;
-    private _sharedStates: VariableScope;
+    private _sharedStates: StateScope;
     private _state: string;
     private _timestamp: number;
 
     constructor(private readerCollectionFactory: (any?) => ReaderCollection,
-                private variableScopeFactory: (any?) => VariableScope,
+                private variableScopeFactory: (any?) => StateScope,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
@@ -128,12 +128,12 @@ export class Reading extends BaseModel {
         this._readers = value;
     }
 
-    get sharedStates(): VariableScope {
+    get sharedStates(): StateScope {
       return this._sharedStates;
     }
 
-    set sharedStates(value: VariableScope) {
-      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "VariableScope", VariableScope);
+    set sharedStates(value: StateScope) {
+      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "StateScope", StateScope);
       this._sharedStates = value;
     }
 

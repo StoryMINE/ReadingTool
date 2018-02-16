@@ -44,7 +44,7 @@ import {CompositeSubscription} from "../utilities/Subscription";
 
 @inject(Factory.of(StateCollection),
         TypeChecker)
-export class VariableScope extends BaseModel implements VariableAccessor, Subscribable {
+export class StateScope extends BaseModel implements VariableAccessor, Subscribable {
 
   private states: StateCollection;
 

@@ -147,7 +147,7 @@ describe("Reading model", () => {
         });
     });
 
-    it("will throw an error when sharedStates is set to something other than an instance of VariableScope", () => {
+    it("will throw an error when sharedStates is set to something other than an instance of StateScope", () => {
         let model = new Reading(factory, factory, typeChecker);
 
         expect(() => {

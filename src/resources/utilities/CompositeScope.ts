@@ -36,17 +36,17 @@
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
-import {VariableScope} from "../models/VariableScope";
+import {StateScope} from "../models/VariableScope";
 import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
 import {CompositeSubscription} from "./Subscription";
 
 export class CompositeScope implements VariableAccessor, Subscribable {
 
-    constructor(private stateScopes: {[scopeName: string]: VariableScope}) {
+    constructor(private stateScopes: {[scopeName: string]: StateScope}) {
     }
 
-    getScope(scopeName: string): VariableScope {
-      let scope: VariableScope = this.stateScopes[scopeName];
+    getScope(scopeName: string): StateScope {
+      let scope: StateScope = this.stateScopes[scopeName];
       if(!scope) {
         throw new Error("Story attempts to access invalid variable scope " + scopeName);
       }

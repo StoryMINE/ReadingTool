@@ -8,19 +8,19 @@ import {ReadingCollection} from "../collections/ReadingCollection";
 import moment = require('moment');
 import {ScopedStates} from "../interfaces/ScopedStates";
 import {Variable} from "../models/Variable";
-import {VariableScope} from "../models/VariableScope";
+import {StateScope} from "../models/VariableScope";
 /**
  * Created by andy on 09/12/16.
  */
 
 @inject(ReadingCollection,
         NewInstance.of(ReadingAPI),
-        Factory.of(VariableScope))
+        Factory.of(StateScope))
 export class ReadingConnector extends AbstractConnector<Reading> {
 
     constructor(private readingCollection : ReadingCollection,
                 private storyplacesAPI: ReadingAPI,
-                private variableScopeFactory: (any?) => VariableScope) {
+                private variableScopeFactory: (any?) => StateScope) {
         super();
         this.storyplacesAPI.path = "/reading/";
     }
