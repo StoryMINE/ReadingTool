@@ -36,34 +36,30 @@ import {Factory, inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
 import {ReaderCollection} from "../collections/ReaderCollection";
-import {StateScope} from "./VariableScope";
+import {StateScope} from "./StateScope";
 
 @inject(Factory.of(ReaderCollection),
-        Factory.of(StateScope),
         TypeChecker)
 export class Reading extends BaseModel {
 
     private _name: string;
     private _storyId: string;
     private _readers: ReaderCollection;
-    private _sharedStates: StateScope;
     private _state: string;
     private _timestamp: number;
 
     constructor(private readerCollectionFactory: (any?) => ReaderCollection,
-                private variableScopeFactory: (any?) => StateScope,
                 typeChecker: TypeChecker, data?: any) {
         super(typeChecker);
         this.fromObject(data);
     }
 
-    fromObject(data: any = {id: undefined, name:undefined, storyId: undefined, readers: undefined, sharedStates: undefined, state:undefined, timestamp: undefined}) {
+    fromObject(data: any = {id: undefined, name:undefined, storyId: undefined, readers: undefined, state:undefined, timestamp: undefined}) {
         this.typeChecker.validateAsObjectAndNotArray("Data", data);
         this.id = data.id;
         this.name = data.name;
         this.storyId = data.storyId;
         this.readers = this.readerCollectionFactory(data.readers);
-        this.sharedStates = this.variableScopeFactory(data.sharedStates);
         this.state = (data.state || "notstarted");
         this.timestamp = data.timestamp;
     }
@@ -74,7 +70,6 @@ export class Reading extends BaseModel {
             name: this.name,
             storyId: this.storyId,
             readers: this.readers,
-            sharedStates: this.sharedStates,
             state: this.state,
             timestamp: this.timestamp,
         }
@@ -127,14 +122,4 @@ export class Reading extends BaseModel {
         this.typeChecker.validateAsObjectOrUndefined('Readers', value, "ReaderCollection", ReaderCollection);
         this._readers = value;
     }
-
-    get sharedStates(): StateScope {
-      return this._sharedStates;
-    }
-
-    set sharedStates(value: StateScope) {
-      this.typeChecker.validateAsObjectOrUndefined("SharedStates", value, "StateScope", StateScope);
-      this._sharedStates = value;
-    }
-
 }

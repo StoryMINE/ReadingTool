@@ -42,6 +42,7 @@ import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {CompositeScope} from "../utilities/CompositeScope";
 import {Subscription} from "../interfaces/Subscription";
+import {StateScope} from "../models/StateScope";
 
 @autoinject()
 export class ReadingManager {
@@ -55,6 +56,9 @@ export class ReadingManager {
     private locationSub: Disposable;
     private timeSub: number;
     private stateUpdateSub: number;
+
+    private globalStates: StateScope;
+    private sharedStates: StateScope;
 
     viewablePages: Array<Page>;
 
@@ -71,8 +75,12 @@ export class ReadingManager {
                     .then((reading) => {
                         this.reading = reading;
                     });
-            })
-            .then(() => {
+            }).then(() => {
+                return this.readingConnector.getStates(this.reading.id).then((states) => {
+                  this.globalStates = states.global;
+                  this.sharedStates = states.shared;
+                });
+            }).then(() => {
                 if (withUpdates) {
                     this.attachListeners();
                     this.updateStatus();
@@ -97,8 +105,8 @@ export class ReadingManager {
       this.stateUpdateSub = window.setInterval(() => {
         this.readingConnector.getStates(this.reading.id).then((states) => {
           this.detachListeners();
-          this.story.globalStates = states.global;
-          this.reading.sharedStates = states.shared;
+          this.globalStates = states.global;
+          this.sharedStates = states.shared;
           this.attachListeners();
           this.variableSub.notify();
         });
@@ -133,7 +141,7 @@ export class ReadingManager {
     }
 
     private getVariableAccessor(): CompositeScope {
-      return new CompositeScope({global: this.story.globalStates, shared: this.reading.sharedStates})
+      return new CompositeScope({global: this.globalStates, shared: this.sharedStates})
     }
 
     private updateStatus() {

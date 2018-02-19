@@ -36,7 +36,7 @@
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
-import {StateScope} from "../models/VariableScope";
+import {StateScope} from "../models/StateScope";
 import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
 import {CompositeSubscription} from "./Subscription";
 

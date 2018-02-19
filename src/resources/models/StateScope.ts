@@ -46,7 +46,10 @@ import {CompositeSubscription} from "../utilities/Subscription";
         TypeChecker)
 export class StateScope extends BaseModel implements VariableAccessor, Subscribable {
 
+  public readingId: string;
+  public storyId: string;
   private states: StateCollection;
+  public revision: number;
 
   constructor(private stateCollectionFactory: (any?) => StateCollection,
               typeChecker: TypeChecker,
@@ -55,13 +58,21 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
     this.fromObject(data);
   }
 
-  fromObject(data: any = []) {
-    this.typeChecker.isArrayOf("Variable Scope States", data, "object");
-    this.states = this.stateCollectionFactory(data);
+  fromObject(data: any = {states: [], revision: 0}) {
+    this.typeChecker.validateAsObjectAndNotArray("StateScope States", data);
+    this.readingId = data.readingId;
+    this.storyId = data.storyId;
+    this.states = this.stateCollectionFactory((data && data.states) || []);
+    this.revision = data.revision;
   }
 
   toJSON() {
-    return this.states.toJSON();
+    return {
+      readingId: this.readingId,
+      storyId: this.storyId,
+      states: this.states,
+      revision: this.revision
+    };
   }
 
   get(varRef: VariableReference): Variable {
