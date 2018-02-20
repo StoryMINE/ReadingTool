@@ -100,4 +100,8 @@ export class ReadingConnector extends AbstractConnector<Reading> {
             };
           });
     }
+
+    saveStates(stateScope: StateScope): Promise<Response> {
+        return this.storyplacesAPI.saveStates(stateScope);
+    }
 }

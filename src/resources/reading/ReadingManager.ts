@@ -141,7 +141,7 @@ export class ReadingManager {
     }
 
     private getVariableAccessor(): CompositeScope {
-      return new CompositeScope({global: this.globalStates, shared: this.sharedStates})
+        return new CompositeScope({global: this.globalStates, shared: this.sharedStates})
     }
 
     private updateStatus() {
@@ -154,12 +154,16 @@ export class ReadingManager {
     }
 
     executePageFunctions(page: Page) {
-      page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
-        this.saveReading();
+        page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
+        this.saveState();
     }
 
     saveReading() {
         this.readingConnector.save(this.reading);
+    }
+
+    saveState() {
+        this.readingConnector.saveStates(this.sharedStates);
     }
 
     startReading() {

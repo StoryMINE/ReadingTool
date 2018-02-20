@@ -3,6 +3,7 @@
  */
 
 import {StoryPlacesAPI} from './StoryplacesAPI';
+import {StateScope} from "../models/StateScope";
 
 export class ReadingAPI extends StoryPlacesAPI {
 
@@ -12,5 +13,12 @@ export class ReadingAPI extends StoryPlacesAPI {
 
     getStates(readingId: string): Promise<Response> {
         return this.client.fetch(this._path + readingId + "/states")
+    }
+
+    saveStates(stateScope: StateScope): Promise<Response> {
+        return this.client.fetch(this._path + stateScope.readingId + "/states", {
+          method: "PUT",
+          body: JSON.stringify(stateScope)
+        });
     }
 }
