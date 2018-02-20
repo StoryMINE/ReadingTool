@@ -40,10 +40,8 @@ import {StoryConnector} from "../store/StoryConnector";
 import {ReadingConnector} from "../store/ReadingConnector";
 import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
-import {CompositeScope} from "../utilities/CompositeScope";
 import {Subscription} from "../interfaces/Subscription";
-import {StateScope} from "../models/StateScope";
-import {ScopedStates} from "../interfaces/ScopedStates";
+import {SynchronisedStateContainer} from "../store/SynchronisedStateContainer";
 
 @autoinject()
 export class ReadingManager {
@@ -57,16 +55,17 @@ export class ReadingManager {
     private locationSub: Disposable;
     private timeSub: number;
 
-    private saving: boolean = false;
-    private stateUpdateSub: number;
     private lastPageExecuted: Page;
-
-    private globalStates: StateScope;
-    private sharedStates: StateScope;
+    private stateContainer: SynchronisedStateContainer;
 
     viewablePages: Array<Page>;
 
-    constructor(private locationManager: LocationManager, private storyConnector: StoryConnector, private readingConnector: ReadingConnector, private bindingEngine: BindingEngine, private cachedMediaConnector: CachedMediaConnector) {
+    constructor(private locationManager: LocationManager,
+                private storyConnector: StoryConnector,
+                private readingConnector: ReadingConnector,
+                private bindingEngine: BindingEngine,
+                private cachedMediaConnector: CachedMediaConnector) {
+      this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
     }
 
     attach(storyId: string, readingId: string, withUpdates: boolean = true) {
@@ -80,15 +79,11 @@ export class ReadingManager {
                         this.reading = reading;
                     });
             }).then(() => {
-                return this.readingConnector.getStates(this.reading.id).then((states) => {
-                  this.globalStates = states.global;
-                  this.sharedStates = states.shared;
-                });
+                return this.stateContainer.initialize(this.reading.id);
             }).then(() => {
                 if (withUpdates) {
-                    this.attachListeners();
-                    this.updateStatus();
-                    this.beginUpdatePolling();
+                  this.attachListeners();
+                  this.updateStatus();
                 }
                 // Start the reading if it has not already been started.
                 if (this.reading.state == "notstarted") {
@@ -101,7 +96,6 @@ export class ReadingManager {
     detach() {
         this.reading = undefined;
         this.story = undefined;
-        this.stopUpdatePolling();
         this.detachListeners();
     }
 
@@ -128,8 +122,8 @@ export class ReadingManager {
         }
     }
 
-    private getVariableAccessor(): CompositeScope {
-        return new CompositeScope({global: this.globalStates, shared: this.sharedStates})
+    private getVariableAccessor(): SynchronisedStateContainer {
+        return this.stateContainer;
     }
 
     private updateStatus() {
@@ -142,10 +136,9 @@ export class ReadingManager {
     }
 
     executePageFunctions(page: Page) {
-        if(this.saving) { return false; }
         this.lastPageExecuted = page;
         page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
-        this.saveState();
+        this.stateContainer.push();
     }
 
     saveReading() {
@@ -160,41 +153,5 @@ export class ReadingManager {
     closeReading() {
         this.reading.state = "closed";
         this.saveReading();
-    }
-
-    saveState() {
-      this.saving = true;
-      console.log("Saving");
-      this.readingConnector.saveStates(this.sharedStates).then((result) => {
-        if(result.collision) {
-          //Set states on Reading Manager
-          this.replaceScopes(result.scopes);
-          //Rerun functions.
-          //Re-attempt post.
-          this.executePageFunctions(this.lastPageExecuted);
-        }
-      }).then(() => this.saving = false, () => this.saving = false);
-    }
-
-    private replaceScopes(states: ScopedStates) {
-      this.detachListeners();
-      this.globalStates = states.global;
-      this.sharedStates = states.shared;
-      this.attachListeners();
-      this.variableSub.notify();
-    }
-
-    private beginUpdatePolling() {
-      this.stateUpdateSub = window.setInterval(() => {
-        if(this.saving) { return false; }
-        this.readingConnector.getStates(this.reading.id).then((scopes) => {
-          if(this.saving) { return; }
-          this.replaceScopes(scopes);
-        });
-      }, this.updateInterval);
-    }
-
-    private stopUpdatePolling() {
-      window.clearInterval(this.stateUpdateSub);
     }
 }
