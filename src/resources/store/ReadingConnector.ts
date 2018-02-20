@@ -7,6 +7,7 @@ import {ReadingCollection} from "../collections/ReadingCollection";
 import {ScopedStates} from "../interfaces/ScopedStates";
 import {StateScope} from "../models/StateScope";
 import moment = require('moment');
+import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
 
 /**
  * Created by andy on 09/12/16.
@@ -101,7 +102,7 @@ export class ReadingConnector extends AbstractConnector<Reading> {
           });
     }
 
-    saveStates(stateScope: StateScope): Promise<Response> {
+    saveStates(stateScope: StateScope): Promise<UpdateStatesResponse> {
         return this.storyplacesAPI.saveStates(stateScope);
     }
 }

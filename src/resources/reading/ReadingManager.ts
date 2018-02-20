@@ -43,6 +43,7 @@ import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {CompositeScope} from "../utilities/CompositeScope";
 import {Subscription} from "../interfaces/Subscription";
 import {StateScope} from "../models/StateScope";
+import {ScopedStates} from "../interfaces/ScopedStates";
 
 @autoinject()
 export class ReadingManager {
@@ -55,7 +56,10 @@ export class ReadingManager {
     private variableSub: Subscription;
     private locationSub: Disposable;
     private timeSub: number;
+
+    private saving: boolean = false;
     private stateUpdateSub: number;
+    private lastPageExecuted: Page;
 
     private globalStates: StateScope;
     private sharedStates: StateScope;
@@ -101,22 +105,6 @@ export class ReadingManager {
         this.detachListeners();
     }
 
-    private beginUpdatePolling() {
-      this.stateUpdateSub = window.setInterval(() => {
-        this.readingConnector.getStates(this.reading.id).then((states) => {
-          this.detachListeners();
-          this.globalStates = states.global;
-          this.sharedStates = states.shared;
-          this.attachListeners();
-          this.variableSub.notify();
-        });
-      }, this.updateInterval);
-    }
-
-    private stopUpdatePolling() {
-      window.clearInterval(this.stateUpdateSub);
-    }
-
     private attachListeners() {
         this.variableSub = this.getVariableAccessor().subscribe(() => this.updateStatus());
         this.locationSub = this.bindingEngine.propertyObserver(this.locationManager, 'location').subscribe(() => this.updateStatus());
@@ -154,16 +142,14 @@ export class ReadingManager {
     }
 
     executePageFunctions(page: Page) {
+        if(this.saving) { return false; }
+        this.lastPageExecuted = page;
         page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
         this.saveState();
     }
 
     saveReading() {
         this.readingConnector.save(this.reading);
-    }
-
-    saveState() {
-        this.readingConnector.saveStates(this.sharedStates);
     }
 
     startReading() {
@@ -174,5 +160,41 @@ export class ReadingManager {
     closeReading() {
         this.reading.state = "closed";
         this.saveReading();
+    }
+
+    saveState() {
+      this.saving = true;
+      console.log("Saving");
+      this.readingConnector.saveStates(this.sharedStates).then((result) => {
+        if(result.collision) {
+          //Set states on Reading Manager
+          this.replaceScopes(result.scopes);
+          //Rerun functions.
+          //Re-attempt post.
+          this.executePageFunctions(this.lastPageExecuted);
+        }
+      }).then(() => this.saving = false, () => this.saving = false);
+    }
+
+    private replaceScopes(states: ScopedStates) {
+      this.detachListeners();
+      this.globalStates = states.global;
+      this.sharedStates = states.shared;
+      this.attachListeners();
+      this.variableSub.notify();
+    }
+
+    private beginUpdatePolling() {
+      this.stateUpdateSub = window.setInterval(() => {
+        if(this.saving) { return false; }
+        this.readingConnector.getStates(this.reading.id).then((scopes) => {
+          if(this.saving) { return; }
+          this.replaceScopes(scopes);
+        });
+      }, this.updateInterval);
+    }
+
+    private stopUpdatePolling() {
+      window.clearInterval(this.stateUpdateSub);
     }
 }
