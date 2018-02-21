@@ -50,7 +50,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
     }, this.updateInterval);
   }
 
-  private replaceScopes(scopes: ScopedStates) {
+  replaceScopes(scopes: ScopedStates) {
     this.stopWatchingStates();
     this.scopes = scopes;
     this.watchStates();

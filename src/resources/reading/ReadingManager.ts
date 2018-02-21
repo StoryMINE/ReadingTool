@@ -42,6 +42,7 @@ import {Page} from "../models/Page";
 import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {Subscription} from "../interfaces/Subscription";
 import {SynchronisedStateContainer} from "../store/SynchronisedStateContainer";
+import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
 
 @autoinject()
 export class ReadingManager {
@@ -138,7 +139,17 @@ export class ReadingManager {
     executePageFunctions(page: Page) {
         this.lastPageExecuted = page;
         page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
-        this.stateContainer.push();
+        this.stateContainer.push().catch((result: UpdateStatesResponse) => {
+          if(result && result.collision && result.scopes) {
+            console.log("COLLISION: Attempting to resolve");
+            this.stateContainer.replaceScopes(result.scopes);
+            this.executePageFunctions(page);
+            console.log("COLLISION: Scopes replace and functions reapplied.");
+            return;
+          }
+          this.stateContainer.push().catch(() =>
+            console.error("ERROR: Second save failed."));
+        });
     }
 
     saveReading() {
