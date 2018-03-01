@@ -78,7 +78,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   }
 
   push(): Promise<UpdateStatesResponse> {
-    this.saveInProgress = this.readingConnector.saveStates(this.scopes.shared).then((result) => {
+    this.saveInProgress = this.readingConnector.saveStates(this.scopes).then((result) => {
       if (result.collision) {
         this.replaceScopes(result.scopes);
         this.saveInProgress = null;

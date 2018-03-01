@@ -143,6 +143,7 @@ export class ReadingManager {
           if(result && result.collision && result.scopes) {
             console.log("COLLISION: Attempting to resolve");
             this.stateContainer.replaceScopes(result.scopes);
+            //if (Page.isReadable)..
             this.executePageFunctions(page);
             console.log("COLLISION: Scopes replace and functions reapplied.");
             return;

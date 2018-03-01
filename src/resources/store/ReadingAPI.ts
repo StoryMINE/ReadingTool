@@ -3,8 +3,8 @@
  */
 
 import {StoryPlacesAPI} from './StoryplacesAPI';
-import {StateScope} from "../models/StateScope";
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
+import {CombinedScopes} from "../interfaces/ScopedStates";
 
 export class ReadingAPI extends StoryPlacesAPI {
 
@@ -16,10 +16,10 @@ export class ReadingAPI extends StoryPlacesAPI {
         return this.client.fetch(this._path + readingId + "/states")
     }
 
-    saveStates(stateScope: StateScope): Promise<UpdateStatesResponse> {
-        return this.client.fetch(this._path + stateScope.readingId + "/states", {
+    saveStates(scopes: CombinedScopes): Promise<UpdateStatesResponse> {
+        return this.client.fetch(this._path + scopes.shared.readingId + "/states", {
           method: "PUT",
-          body: JSON.stringify(stateScope)
+          body: JSON.stringify(scopes)
         }).then((response) => {
           return response.json()
         }).then((data) => {

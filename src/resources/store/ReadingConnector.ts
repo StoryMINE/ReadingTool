@@ -6,8 +6,8 @@ import {ReadingAPI} from "./ReadingAPI";
 import {ReadingCollection} from "../collections/ReadingCollection";
 import {CombinedScopes} from "../interfaces/ScopedStates";
 import {StateScope} from "../models/StateScope";
-import moment = require('moment');
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
+import moment = require('moment');
 
 /**
  * Created by andy on 09/12/16.
@@ -102,7 +102,7 @@ export class ReadingConnector extends AbstractConnector<Reading> {
           });
     }
 
-    saveStates(stateScope: StateScope): Promise<UpdateStatesResponse> {
-        return this.storyplacesAPI.saveStates(stateScope);
+    saveStates(scopes: CombinedScopes): Promise<UpdateStatesResponse> {
+        return this.storyplacesAPI.saveStates(scopes);
     }
 }
