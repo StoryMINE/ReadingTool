@@ -1,6 +1,6 @@
 import {StateScope} from "../models/StateScope";
 
-export interface ScopedStates {
+export interface CombinedScopes {
   global: StateScope,
   shared: StateScope
 }

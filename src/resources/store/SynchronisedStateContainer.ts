@@ -5,7 +5,7 @@ import {VariableReference} from "../models/VariableReference";
 import {Variable} from "../models/Variable";
 import {ReadingConnector} from "./ReadingConnector";
 import {StateScope} from "../models/StateScope";
-import {ScopedStates} from "../interfaces/ScopedStates";
+import {CombinedScopes} from "../interfaces/ScopedStates";
 import {CompositeSubscription, SimpleSubscriptionService} from "../utilities/Subscription";
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
 
@@ -20,7 +20,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   public updateInterval = 500;
 
   private readingId: string;
-  private scopes: ScopedStates;
+  private scopes: CombinedScopes;
 
   private stateUpdateTimer: number;
   private saveInProgress: Promise<UpdateStatesResponse>;
@@ -33,7 +33,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
 
   initialize(readingId: string): Promise<void> {
     this.readingId = readingId;
-    return this.readingConnector.getStates(this.readingId).then((scopes: ScopedStates) => {
+    return this.readingConnector.getStates(this.readingId).then((scopes: CombinedScopes) => {
       this.scopes = scopes;
     }).then(() => {
       this.beginPolling();
@@ -50,7 +50,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
     }, this.updateInterval);
   }
 
-  replaceScopes(scopes: ScopedStates) {
+  replaceScopes(scopes: CombinedScopes) {
     this.stopWatchingStates();
     this.scopes = scopes;
     this.watchStates();

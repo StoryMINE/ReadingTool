@@ -4,7 +4,7 @@ import {Reading} from "../models/Reading";
 import {ReadingAPI} from "./ReadingAPI";
 
 import {ReadingCollection} from "../collections/ReadingCollection";
-import {ScopedStates} from "../interfaces/ScopedStates";
+import {CombinedScopes} from "../interfaces/ScopedStates";
 import {StateScope} from "../models/StateScope";
 import moment = require('moment');
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
@@ -91,10 +91,10 @@ export class ReadingConnector extends AbstractConnector<Reading> {
         return this.all.filter(reading => reading.storyId == storyId);
     }
 
-    getStates(readingId: string): Promise<ScopedStates> {
+    getStates(readingId: string): Promise<CombinedScopes> {
         return this.storyplacesAPI.getStates(readingId)
           .then((response) => response.json())
-          .then((states: ScopedStates) => {
+          .then((states: CombinedScopes) => {
             return {
               global: this.stateScopeFactory(states.global),
               shared: this.stateScopeFactory(states.shared)

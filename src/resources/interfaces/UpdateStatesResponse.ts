@@ -1,6 +1,6 @@
-import {ScopedStates} from "./ScopedStates";
+import {CombinedScopes} from "./ScopedStates";
 
 export interface UpdateStatesResponse {
   collision: boolean;
-  scopes: ScopedStates;
+  scopes: CombinedScopes;
 }
