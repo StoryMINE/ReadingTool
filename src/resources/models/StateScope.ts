@@ -49,7 +49,7 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
   public readingId: string;
   public storyId: string;
   private states: StateCollection;
-  public revision: number;
+  public revision: string;
 
   constructor(private stateCollectionFactory: (any?) => StateCollection,
               typeChecker: TypeChecker,
