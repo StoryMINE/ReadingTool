@@ -140,16 +140,29 @@ export class ReadingManager {
         this.lastPageExecuted = page;
         page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
         this.stateContainer.push().catch((result: UpdateStatesResponse) => {
-          if(result && result.collision && result.scopes) {
+          console.log("COLLISION: Preparing to detect.");
+          console.log(result);
+          if(result && result.collision) {
             console.log("COLLISION: Attempting to resolve");
-            this.stateContainer.replaceScopes(result.scopes);
-            //if (Page.isReadable)..
-            this.executePageFunctions(page);
-            console.log("COLLISION: Scopes replace and functions reapplied.");
-            return;
+            this.updateStatus();
+            if(page.isReadable) {
+              //this.executePageFunctions(page);
+              page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
+
+              console.log("COLLISION: Page reapplied.");
+            } else {
+              console.log("COLLISION: Page no longer readable, aborting.");
+            }
           }
-          this.stateContainer.push().catch(() =>
-            console.error("ERROR: Second save failed."));
+          this.stateContainer.push().then(() => {
+            console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
+            this.updateStatus();
+            console.log("Readable:", page.isReadable);
+          }).catch((data) => {
+            console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
+            console.log(data);
+            this.updateStatus();
+          });
         });
     }
 

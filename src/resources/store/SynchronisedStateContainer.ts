@@ -33,10 +33,13 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
 
   initialize(readingId: string): Promise<void> {
     this.readingId = readingId;
+    console.log("PERFORMING INIT");
     return this.readingConnector.getStates(this.readingId).then((scopes: CombinedScopes) => {
-      this.scopes = scopes;
+      console.log("ASSIGNING INIT STATES");
+      this.replaceScopes(scopes);
     }).then(() => {
-      this.beginPolling();
+      //this.beginPolling();
+      this.scopes.shared.revision = "banana";
     })
   }
 
@@ -51,6 +54,11 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   }
 
   replaceScopes(scopes: CombinedScopes) {
+    if (this.scopes
+       && scopes.shared.revisionNumber <= this.scopes.shared.revisionNumber
+       && scopes.global.revisionNumber <= this.scopes.global.revisionNumber) {
+      return;
+    }
     this.stopWatchingStates();
     this.scopes = scopes;
     this.watchStates();
@@ -65,6 +73,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
 
   private watchStates() {
     let callback = this.subscriptionService.notify.bind(this.subscriptionService);
+    console.log(this.scopes);
     this.stateChangeSubscription =
       new CompositeSubscription(callback, [this.scopes.global, this.scopes.shared])
   }
@@ -78,15 +87,16 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   }
 
   push(): Promise<UpdateStatesResponse> {
+    console.log("PERFORMING PUSH");
     this.saveInProgress = this.readingConnector.saveStates(this.scopes).then((result) => {
+      this.replaceScopes(result.scopes);
+      this.saveInProgress = null;
       if (result.collision) {
-        this.replaceScopes(result.scopes);
-        this.saveInProgress = null;
         return Promise.reject(result);
       }
-      this.saveInProgress = null;
       return Promise.resolve(result);
     });
+    console.log("PUSHED:", this.scopes);
     return this.saveInProgress;
   }
 
