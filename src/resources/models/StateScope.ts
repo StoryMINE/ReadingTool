@@ -50,6 +50,7 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
   public storyId: string;
   private states: StateCollection;
   public revision: string;
+  public revisionNumber: number;
 
   constructor(private stateCollectionFactory: (any?) => StateCollection,
               typeChecker: TypeChecker,
@@ -64,6 +65,7 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
     this.storyId = data.storyId;
     this.states = this.stateCollectionFactory((data && data.states) || []);
     this.revision = data.revision;
+    this.revisionNumber = data.revisionNumber;
   }
 
   toJSON() {
@@ -71,7 +73,8 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
       readingId: this.readingId,
       storyId: this.storyId,
       states: this.states,
-      revision: this.revision
+      revision: this.revision,
+      revisionNumber: this.revisionNumber
     };
   }
 
