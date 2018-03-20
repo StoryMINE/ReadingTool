@@ -103,6 +103,20 @@ export class ReadingConnector extends AbstractConnector<Reading> {
     }
 
     saveStates(scopes: CombinedScopes): Promise<UpdateStatesResponse> {
-        return this.storyplacesAPI.saveStates(scopes);
+        return this.storyplacesAPI.saveStates(scopes)
+          .then((response) => {
+          return response.json()
+        }).then((data) => {
+          if(!data || data.scopes == null) {
+            return Promise.reject(null);
+          }
+          return Promise.resolve({
+            collision: data.collision,
+            scopes: {
+              global: this.stateScopeFactory(data.scopes.global),
+              shared: this.stateScopeFactory(data.scopes.shared)
+            }
+          });
+        });
     }
 }

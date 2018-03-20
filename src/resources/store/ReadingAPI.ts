@@ -16,19 +16,10 @@ export class ReadingAPI extends StoryPlacesAPI {
         return this.client.fetch(this._path + readingId + "/states")
     }
 
-    saveStates(scopes: CombinedScopes): Promise<UpdateStatesResponse> {
+    saveStates(scopes: CombinedScopes): Promise<Response> {
         return this.client.fetch(this._path + scopes.shared.readingId + "/states", {
           method: "PUT",
           body: JSON.stringify(scopes)
-        }).then((response) => {
-          return response.json()
-        }).then((data) => {
-          return new Promise<UpdateStatesResponse>((resolve, reject) => {
-            if(!data || data.scopes == null) {
-              return reject(null);
-            }
-            return resolve(data);
-          });
         });
     }
 }
