@@ -43,6 +43,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   }
 
   beginPolling() {
+    clearInterval(this.stateUpdateTimer);
     this.stateUpdateTimer = window.setInterval(() => {
       if(this.saveInProgress) { return false; }
       this.readingConnector.getStates(this.readingId).then((scopes) => {
