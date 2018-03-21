@@ -38,8 +38,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
       console.log("ASSIGNING INIT STATES");
       this.replaceScopes(scopes);
     }).then(() => {
-      //this.beginPolling();
-      this.scopes.shared.revision = "banana";
+      this.beginPolling();
     })
   }
 
