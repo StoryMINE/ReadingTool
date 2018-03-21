@@ -56,7 +56,6 @@ export class ReadingManager {
     private locationSub: Disposable;
     private timeSub: number;
 
-    private lastPageExecuted: Page;
     private stateContainer: SynchronisedStateContainer;
 
     viewablePages: Array<Page>;
@@ -136,33 +135,45 @@ export class ReadingManager {
         this.viewablePages = this.story.pages.all.filter(page => page.isViewable);
     }
 
+    //TODO Rename to executePageFunctions
+    private executePageFunctionsImpl(page: Page) {
+        page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions)
+    }
+
+    //TODO Rename to executePageFunctionsAndSave
     executePageFunctions(page: Page) {
-        this.lastPageExecuted = page;
-        page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
+        this.executePageFunctionsImpl(page);
+
+        //Attempt to save, handling collisions.
         this.stateContainer.push().catch((result: UpdateStatesResponse) => {
-          console.log("COLLISION: Preparing to detect.");
-          console.log(result);
+          console.log("COLLISION: Checking for a collision.");
           if(result && result.collision) {
             console.log("COLLISION: Attempting to resolve");
+            //Update every page with the new variables before checking if it's readable.
             this.updateStatus();
             if(page.isReadable) {
-              //this.executePageFunctions(page);
-              page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions);
-
+              this.executePageFunctionsImpl(page);
               console.log("COLLISION: Page reapplied.");
             } else {
               console.log("COLLISION: Page no longer readable, aborting.");
+              return;
             }
           }
+
+          //Attempt a second save, in case:
+          //A) We've corrected the error above
+          //B)
           this.stateContainer.push().then(() => {
             console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
-            this.updateStatus();
-            console.log("Readable:", page.isReadable);
           }).catch((data) => {
             console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
             console.log(data);
+          }).then(() => {
+            console.log("EXECUTE PAGE FUNCTIONS: Updating page status");
             this.updateStatus();
-          });
+            console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
+          })
+
         });
     }
 
