@@ -17,7 +17,7 @@ import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
  */
 @inject(NewInstance.of(ReadingConnector))
 export class SynchronisedStateContainer implements VariableAccessor, Subscribable {
-  public updateInterval = 500;
+  public updateInterval = 1000;
 
   private readingId: string;
   private scopes: CombinedScopes;
