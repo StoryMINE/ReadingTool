@@ -90,13 +90,13 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
     console.log("PERFORMING PUSH");
     this.saveInProgress = this.readingConnector.saveStates(this.scopes).then((result) => {
       this.replaceScopes(result.scopes);
+      console.log("PUSHED:", this.scopes);
       this.saveInProgress = null;
       if (result.collision) {
         return Promise.reject(result);
       }
       return Promise.resolve(result);
     });
-    console.log("PUSHED:", this.scopes);
     return this.saveInProgress;
   }
 
