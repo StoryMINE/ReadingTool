@@ -46,6 +46,8 @@ import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
 import {Authenticator} from "../auth/Authenticator";
 import {VariableNamespaceResolver} from "../utilities/VariableNamespaceResolver";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
+import {Role} from "../models/Role";
+import {GetUserRole} from "../utilities/RoleManagement";
 
 @autoinject()
 export class ReadingManager {
@@ -195,16 +197,11 @@ export class ReadingManager {
         this.saveReading();
     }
 
-    getLocalUserRole(): string {
-        let variableAccessor = this.getVariableAccessor();
+    getLocalUserRole(): Role {
+        return this.getUserRole(this.auth.userId);
+    }
 
-        this.story.roles.forEach(role => {
-            let assignmentRef = role.AssignmentVariable();
-            let variable = variableAccessor.get(assignmentRef);
-            if(variable && variable.value == this.auth.userId) {
-                return variable.id;
-            }
-        });
-        return null;
+    getUserRole(userId: string): Role {
+        return GetUserRole(userId, this.getVariableAccessor(), this.story);
     }
 }

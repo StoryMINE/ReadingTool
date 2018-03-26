@@ -68,13 +68,4 @@ export class Role extends BaseModel {
         this.typeChecker.validateAsBooleanOrUndefined('Required', value);
         this._required = value;
     }
-
-    // Constructs a VariableReference for the player id assigned to this role
-    AssignmentVariable(): VariableReference {
-        return new VariableReference(this.typeChecker, {
-            namespace: "_roles",
-            scope: "shared",
-            variable: this.id
-        })
-    }
 }

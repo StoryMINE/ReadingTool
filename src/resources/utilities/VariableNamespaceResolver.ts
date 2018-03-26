@@ -11,7 +11,7 @@ export class VariableNamespaceResolver implements VariableAccessor {
         if (varRef.namespace == "this") {
             let localUserRole = this.readingManager.getLocalUserRole();
             let newVarRef = varRef.clone();
-            newVarRef.namespace = localUserRole ? localUserRole : this.readingManager.auth.userId;
+            newVarRef.namespace = localUserRole ? localUserRole.id : this.readingManager.auth.userId;
             console.log("CURRENT ROLE: " + newVarRef.namespace);
             return newVarRef
         }
