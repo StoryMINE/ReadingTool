@@ -42,6 +42,8 @@ import {LoggingHelper} from "../../logging/LoggingHelper";
 import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableReference} from "../VariableReference";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Story} from "../Story";
+import {Reading} from "../Reading";
 
 @inject(TypeChecker,
   LoggingHelper,
@@ -96,7 +98,7 @@ export class SetFunction extends BaseFunction {
         this._variable = value;
     }
 
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }
@@ -105,6 +107,6 @@ export class SetFunction extends BaseFunction {
 
         variables.save(this.variable, this.value);
 
-        this.loggingHelper.logChangeVariable(storyId, readingId, variable.id, variable.value);
+        this.loggingHelper.logChangeVariable(story.id, reading.id, variable.id, variable.value);
     }
 }

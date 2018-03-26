@@ -43,6 +43,8 @@ import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableReference} from "../VariableReference";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
 import moment = require('moment');
+import {Story} from "../Story";
+import {Reading} from "../Reading";
 
 @inject(TypeChecker,
   LoggingHelper,
@@ -85,7 +87,7 @@ export class SetTimeStampFunction extends BaseFunction {
         this._variable = value;
     }
 
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }
@@ -95,6 +97,6 @@ export class SetTimeStampFunction extends BaseFunction {
         let newValue = moment().unix().toString();
         variables.save(this.variable, newValue);
 
-        this.loggingHelper.logChangeVariable(storyId, readingId, this.variable.id, variable.value);
+        this.loggingHelper.logChangeVariable(story.id, reading.id, this.variable.id, variable.value);
     }
 }

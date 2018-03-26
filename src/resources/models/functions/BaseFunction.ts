@@ -40,6 +40,8 @@ import {LocationInformation} from "../../gps/LocationInformation";
 import {ExecutableFunction} from "../../interfaces/ExecutableFunction";
 import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Story} from "../Story";
+import {Reading} from "../Reading";
 
 export abstract class BaseFunction extends BaseModel implements ExecutableFunction {
     private _conditions: Array<string>;
@@ -57,7 +59,7 @@ export abstract class BaseFunction extends BaseModel implements ExecutableFuncti
         this._conditions = value;
     }
 
-    abstract execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any ;
+    abstract execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any ;
 
     protected allConditionsPass(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         return this.conditions.every((conditionId) => {

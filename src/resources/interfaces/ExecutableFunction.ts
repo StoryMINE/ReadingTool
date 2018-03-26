@@ -38,7 +38,9 @@ import {LocationInformation} from "../gps/LocationInformation";
 import {LocationCollection} from "../collections/LocationCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {VariableAccessor} from "./VariableAccessor";
+import {Reading} from "../models/Reading";
+import {Story} from "../models/Story";
 
 export interface ExecutableFunction {
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any;
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any;
 }

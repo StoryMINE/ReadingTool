@@ -33,7 +33,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {TypeChecker} from "../../utilities/TypeChecker";
-import {inject, Factory} from "aurelia-framework";
+import {Factory, inject} from "aurelia-framework";
 import {BaseFunction} from "./BaseFunction";
 import {ConditionCollection} from "../../collections/ConditionCollection";
 import {LocationCollection} from "../../collections/LocationCollection";
@@ -42,6 +42,8 @@ import {LoggingHelper} from "../../logging/LoggingHelper";
 import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableReference} from "../VariableReference";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Reading} from "../Reading";
+import {Story} from "../Story";
 
 @inject(TypeChecker,
         LoggingHelper,
@@ -96,7 +98,7 @@ export class IncrementFunction extends BaseFunction {
         this._variable = value;
     }
 
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }
@@ -108,7 +110,7 @@ export class IncrementFunction extends BaseFunction {
 
         variables.save(this.variable, newValue.toString());
 
-        this.loggingHelper.logChangeVariable(storyId, readingId, this.variable.id, variable.value);
+        this.loggingHelper.logChangeVariable(story.id, reading.id, this.variable.id, variable.value);
     }
 
 }

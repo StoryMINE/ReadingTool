@@ -40,6 +40,8 @@ import {LocationCollection} from "../collections/LocationCollection";
 import {ConditionCollection} from "../collections/ConditionCollection";
 import {FunctionCollection} from "../collections/FunctionCollection";
 import {VariableAccessor} from "../interfaces/VariableAccessor";
+import {Story} from "./Story";
+import {Reading} from "./Reading";
 
 @inject(TypeChecker)
 export class Page extends BaseModel {
@@ -204,9 +206,9 @@ export class Page extends BaseModel {
             });
     }
 
-    public executeFunctions(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation, functions: FunctionCollection) {
+    public executeFunctions(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation, functions: FunctionCollection) {
         this.functions.forEach((functionId) => {
-            this.getFunction(functions, functionId).execute(storyId, readingId, variables, conditions, functions, locations, userLocation);
+            this.getFunction(functions, functionId).execute(story, reading, variables, conditions, functions, locations, userLocation);
         });
     }
 

@@ -141,7 +141,7 @@ export class ReadingManager {
 
     //TODO Rename to executePageFunctions
     private executePageFunctionsImpl(page: Page) {
-        page.executeFunctions(this.story.id, this.reading.id, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions)
+        page.executeFunctions(this.story, this.reading, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions)
     }
 
     //TODO Rename to executePageFunctionsAndSave

@@ -41,6 +41,8 @@ import {LocationInformation} from "../../gps/LocationInformation";
 import {LoggingHelper} from "../../logging/LoggingHelper";
 import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Reading} from "../Reading";
+import {Story} from "../Story";
 
 @inject(TypeChecker, LoggingHelper)
 
@@ -82,7 +84,7 @@ export class ChainFunction extends BaseFunction {
     }
 
 
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         if (!this.allConditionsPass(variables, conditions, locations, userLocation)) {
             return;
         }
@@ -92,7 +94,7 @@ export class ChainFunction extends BaseFunction {
         }
 
         this.functionIds.forEach((functionId) => {
-            this.getFunction(functions, functionId).execute(storyId, readingId, variables, conditions, functions, locations, userLocation);
+            this.getFunction(functions, functionId).execute(story, reading, variables, conditions, functions, locations, userLocation);
         });
     }
 

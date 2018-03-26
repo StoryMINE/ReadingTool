@@ -40,6 +40,8 @@ import {LocationCollection} from "../../collections/LocationCollection";
 import {LocationInformation} from "../../gps/LocationInformation";
 import {FunctionCollection} from "../../collections/FunctionCollection";
 import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Story} from "../Story";
+import {Reading} from "../Reading";
 
 @inject(TypeChecker)
 
@@ -67,7 +69,7 @@ export class NullFunction extends BaseFunction {
         };
     }
 
-  execute(storyId: string, readingId: string, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
+    execute(story: Story, reading: Reading, variables: VariableAccessor, conditions: ConditionCollection, functions: FunctionCollection, locations: LocationCollection, userLocation: LocationInformation): any {
         return;
     }
 }
