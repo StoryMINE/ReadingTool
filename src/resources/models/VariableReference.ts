@@ -66,6 +66,10 @@ export class VariableReference extends BaseModel {
       }
     }
 
+    clone(): VariableReference {
+        return new VariableReference(this.typeChecker, this.toJSON());
+    }
+
     get namespace(): string {
         return this._namespace;
     }

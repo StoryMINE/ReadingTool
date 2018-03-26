@@ -35,6 +35,7 @@
 import {inject} from "aurelia-framework";
 import {BaseModel} from "./BaseModel";
 import {TypeChecker} from "../utilities/TypeChecker";
+import {VariableReference} from "./VariableReference";
 
 @inject(TypeChecker)
 export class Role extends BaseModel {
@@ -66,5 +67,14 @@ export class Role extends BaseModel {
     set required(value: boolean) {
         this.typeChecker.validateAsBooleanOrUndefined('Required', value);
         this._required = value;
+    }
+
+    // Constructs a VariableReference for the player id assigned to this role
+    AssignmentVariable(): VariableReference {
+        return new VariableReference(this.typeChecker, {
+            namespace: "_roles",
+            scope: "shared",
+            variable: this.id
+        })
     }
 }

@@ -43,6 +43,9 @@ import {CachedMediaConnector} from "../store/CachedMediaConnector";
 import {Subscription} from "../interfaces/Subscription";
 import {SynchronisedStateContainer} from "../store/SynchronisedStateContainer";
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
+import {Authenticator} from "../auth/Authenticator";
+import {VariableNamespaceResolver} from "../utilities/VariableNamespaceResolver";
+import {VariableAccessor} from "../interfaces/VariableAccessor";
 
 @autoinject()
 export class ReadingManager {
@@ -64,7 +67,8 @@ export class ReadingManager {
                 private storyConnector: StoryConnector,
                 private readingConnector: ReadingConnector,
                 private bindingEngine: BindingEngine,
-                private cachedMediaConnector: CachedMediaConnector) {
+                private cachedMediaConnector: CachedMediaConnector,
+                public auth: Authenticator) {
       this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
     }
 
@@ -100,7 +104,7 @@ export class ReadingManager {
     }
 
     private attachListeners() {
-        this.variableSub = this.getVariableAccessor().subscribe(() => this.updateStatus());
+        this.variableSub = this.stateContainer.subscribe(() => this.updateStatus());
         this.locationSub = this.bindingEngine.propertyObserver(this.locationManager, 'location').subscribe(() => this.updateStatus());
         this.timeSub = window.setInterval(() => this.updateStatus(), 60 * 1000);
     }
@@ -122,8 +126,8 @@ export class ReadingManager {
         }
     }
 
-    private getVariableAccessor(): SynchronisedStateContainer {
-        return this.stateContainer;
+    private getVariableAccessor(): VariableAccessor {
+        return new VariableNamespaceResolver(this.stateContainer, this);
     }
 
     private updateStatus() {
@@ -189,5 +193,18 @@ export class ReadingManager {
     closeReading() {
         this.reading.state = "closed";
         this.saveReading();
+    }
+
+    getLocalUserRole(): string {
+        let variableAccessor = this.getVariableAccessor();
+
+        this.story.roles.forEach(role => {
+            let assignmentRef = role.AssignmentVariable();
+            let variable = variableAccessor.get(assignmentRef);
+            if(variable && variable.value == this.auth.userId) {
+                return variable.id;
+            }
+        });
+        return null;
     }
 }
