@@ -70,7 +70,7 @@ export class ReadingOverviewListCustomElement {
         var readingName = "Reading " + (this.readings.length + 1);
         var reading = this.readingFactory({
           storyId: this.storyId,
-          readers: [{id: this.auth.userId, roleName: this.storyCollection.get(this.storyId).roles[0]}],
+          readers: [],
           name: readingName
         });
         this.readingConnector.save(reading);
