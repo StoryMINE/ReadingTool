@@ -79,7 +79,7 @@ export class ReadingOverviewListCustomElement {
     }
 
     refresh() {
-        this.readingConnector.fetchForUserAndStory(this.auth.userId, this.storyId);
+        this.readingConnector.fetchForStory(this.storyId);
     }
 
 

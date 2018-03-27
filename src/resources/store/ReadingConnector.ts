@@ -71,6 +71,15 @@ export class ReadingConnector extends AbstractConnector<Reading> {
             });
     }
 
+    fetchForStory(storyId: string): Promise<void> {
+        return this.storyplacesAPI.getAllForStory(storyId)
+            .then(readings => readings.json() as any)
+            .then (readings => {
+                this.readingCollection.saveMany(readings);
+                return;
+            });
+    }
+
     save(object: Reading): Promise<Reading> {
         object.timestamp = moment().unix();
         return this.storyplacesAPI.save(object)

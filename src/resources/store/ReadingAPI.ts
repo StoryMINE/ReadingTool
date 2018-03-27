@@ -12,6 +12,10 @@ export class ReadingAPI extends StoryPlacesAPI {
         return this.client.fetch(this._path + "story/" + storyId +"/user/" + userId);
     }
 
+    getAllForStory(storyId: String): Promise<Response> {
+        return this.client.fetch(this._path + "story/" + storyId);
+    }
+
     getStates(readingId: string): Promise<Response> {
         return this.client.fetch(this._path + readingId + "/states")
     }
