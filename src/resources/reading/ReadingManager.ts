@@ -33,7 +33,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import {LocationManager} from "../gps/LocationManager";
-import {autoinject, BindingEngine, Disposable} from "aurelia-framework";
+import {autoinject, BindingEngine, Disposable, factory, inject, Factory} from "aurelia-framework";
 import {Reading} from "../models/Reading";
 import {Story} from "../models/Story";
 import {StoryConnector} from "../store/StoryConnector";
@@ -48,8 +48,16 @@ import {VariableNamespaceResolver} from "../utilities/VariableNamespaceResolver"
 import {VariableAccessor} from "../interfaces/VariableAccessor";
 import {Role} from "../models/Role";
 import {GetUserRole} from "../utilities/RoleManagement";
+import {Reader} from "../models/Reader";
 
-@autoinject()
+//@autoinject()
+@inject(LocationManager,
+        StoryConnector,
+        ReadingConnector,
+        BindingEngine,
+        CachedMediaConnector,
+        Factory.of(Reader),
+        Authenticator)
 export class ReadingManager {
 
     story: Story;
@@ -70,6 +78,7 @@ export class ReadingManager {
                 private readingConnector: ReadingConnector,
                 private bindingEngine: BindingEngine,
                 private cachedMediaConnector: CachedMediaConnector,
+                private readerFactory: (any?) => Reader,
                 public auth: Authenticator) {
       this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
     }
@@ -91,6 +100,13 @@ export class ReadingManager {
                   this.attachListeners();
                   this.updateStatus();
                 }
+
+                if(!this.reading.readers.get(this.auth.userId)) {
+                    this.reading.readers.save(this.readerFactory({id: this.auth.userId}));
+                    this.saveReading();
+                }
+
+
                 // Start the reading if it has not already been started.
                 if (this.reading.state == "notstarted") {
                     this.startReading();
