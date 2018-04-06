@@ -80,7 +80,7 @@ export class ReadingManager {
                 private cachedMediaConnector: CachedMediaConnector,
                 private readerFactory: (any?) => Reader,
                 public auth: Authenticator) {
-      this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
+        this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
     }
 
     attach(storyId: string, readingId: string, withUpdates: boolean = true) {
@@ -97,8 +97,8 @@ export class ReadingManager {
                 return this.stateContainer.initialize(this.reading.id);
             }).then(() => {
                 if (withUpdates) {
-                  this.attachListeners();
-                  this.updateStatus();
+                    this.attachListeners();
+                    this.updateStatus();
                 }
 
                 if(!this.reading.readers.get(this.auth.userId)) {
@@ -166,36 +166,36 @@ export class ReadingManager {
 
         //Attempt to save, handling collisions.
         return this.stateContainer.push().catch((result: UpdateStatesResponse) => {
-          console.log("COLLISION: Checking for a collision.");
-          if(result && result.collision) {
-            console.log("COLLISION: Attempting to resolve");
-            //Update every page with the new variables before checking if it's readable.
-            this.updateStatus();
-            if(page.isReadable) {
-              this.executePageFunctionsImpl(page);
-              console.log("COLLISION: Page reapplied.");
-            } else {
-              console.log("COLLISION: Page no longer readable, aborting.");
-              return;
+            console.log("COLLISION: Checking for a collision.");
+            if(result && result.collision) {
+                console.log("COLLISION: Attempting to resolve");
+                //Update every page with the new variables before checking if it's readable.
+                this.updateStatus();
+                if(page.isReadable) {
+                    this.executePageFunctionsImpl(page);
+                    console.log("COLLISION: Page reapplied.");
+                } else {
+                    console.log("COLLISION: Page no longer readable, aborting.");
+                    return;
+                }
             }
-          }
 
-          //Attempt a second save, in case:
-          //A) We've corrected the error above
-          //B)
-          return this.stateContainer.push().then((result: UpdateStatesResponse) => {
-              console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
-              this.updateStatus();
-              console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
-              return Promise.resolve(result);
-            },
-            (result: UpdateStatesResponse) => {
-              console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
-              console.log(result);
-              this.updateStatus();
-              console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
-              return Promise.reject(result);
-            });
+            //Attempt a second save, in case:
+            //A) We've corrected the error above
+            //B)
+            return this.stateContainer.push().then((result: UpdateStatesResponse) => {
+                    console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
+                    this.updateStatus();
+                    console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
+                    return Promise.resolve(result);
+                },
+                (result: UpdateStatesResponse) => {
+                    console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
+                    console.log(result);
+                    this.updateStatus();
+                    console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
+                    return Promise.reject(result);
+                });
         });
     }
 
