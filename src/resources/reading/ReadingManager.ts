@@ -148,7 +148,7 @@ export class ReadingManager {
         return new VariableNamespaceResolver(this.stateContainer, this);
     }
 
-    private updateStatus() {
+    updateStatus() {
         console.log("updating page status");
         this.story.pages.forEach(page => {
             page.updateStatus(this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location);
@@ -185,15 +185,11 @@ export class ReadingManager {
             //B)
             return this.stateContainer.push().then((result: UpdateStatesResponse) => {
                     console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
-                    this.updateStatus();
-                    console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
                     return Promise.resolve(result);
                 },
                 (result: UpdateStatesResponse) => {
                     console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
                     console.log(result);
-                    this.updateStatus();
-                    console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
                     return Promise.reject(result);
                 });
         });

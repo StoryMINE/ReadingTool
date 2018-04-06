@@ -47,7 +47,10 @@ export class PageSummary{
         },
         (result: UpdateStatesResponse) => {
             //Do nothing yet.
-        });
+        }).then(() => {
+            //Don't believe this is necessary, as ReadingManager should update itself.
+            this.readingManager.updateStatus();
+        })
     }
 
 }
