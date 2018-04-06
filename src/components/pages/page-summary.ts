@@ -1,7 +1,10 @@
 import {Page} from "../../resources/models/Page";
-import {bindable, containerless, inject} from "aurelia-framework";
+import {autoinject, bindable, containerless} from "aurelia-framework";
+import {Router} from "aurelia-router";
+import {ReadingManager} from "../../resources/reading/ReadingManager";
+import {UpdateStatesResponse} from "../../resources/interfaces/UpdateStatesResponse";
 
-@inject(Element)
+@autoinject()
 @containerless()
 export class PageSummary{
 
@@ -9,12 +12,9 @@ export class PageSummary{
     @bindable storyId: string;
     @bindable readingId: string;
     @bindable demoMode: boolean;
+    @bindable pageFunctionsExecuting: boolean;
 
-    private element: Element;
-
-    constructor(element: Element) {
-        this.element = element;
-    }
+    constructor(private element: Element, private router: Router, private readingManager: ReadingManager) {}
 
     private locatePage() {
         if (!this.demoMode) {
@@ -32,6 +32,22 @@ export class PageSummary{
         let changeEvent = document.createEvent('CustomEvent');
         changeEvent.initCustomEvent('locate', true, true, pageId);
         return changeEvent;
+    }
+
+    callPageFunctions() {
+        if(this.pageFunctionsExecuting) { return false; }
+        this.pageFunctionsExecuting = true;
+
+        this.readingManager.executePageFunctionsAndSave(this.page).then((result: UpdateStatesResponse) => {
+            this.router.navigateToRoute("page-read", {
+                pageId: this.page.id,
+                storyId: this.storyId,
+                readingId: this.readingId
+            });
+        },
+        (result: UpdateStatesResponse) => {
+            //Do nothing yet.
+        });
     }
 
 }

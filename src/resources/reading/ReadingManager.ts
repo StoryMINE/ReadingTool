@@ -157,17 +157,15 @@ export class ReadingManager {
         this.viewablePages = this.story.pages.all.filter(page => page.isViewable);
     }
 
-    //TODO Rename to executePageFunctions
     private executePageFunctionsImpl(page: Page) {
         page.executeFunctions(this.story, this.reading, this.getVariableAccessor(), this.story.conditions, this.story.locations, this.locationManager.location, this.story.functions)
     }
 
-    //TODO Rename to executePageFunctionsAndSave
-    executePageFunctions(page: Page) {
+    executePageFunctionsAndSave(page: Page): Promise<UpdateStatesResponse> {
         this.executePageFunctionsImpl(page);
 
         //Attempt to save, handling collisions.
-        this.stateContainer.push().catch((result: UpdateStatesResponse) => {
+        return this.stateContainer.push().catch((result: UpdateStatesResponse) => {
           console.log("COLLISION: Checking for a collision.");
           if(result && result.collision) {
             console.log("COLLISION: Attempting to resolve");
@@ -185,17 +183,19 @@ export class ReadingManager {
           //Attempt a second save, in case:
           //A) We've corrected the error above
           //B)
-          this.stateContainer.push().then(() => {
-            console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
-          }).catch((data) => {
-            console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
-            console.log(data);
-          }).then(() => {
-            console.log("EXECUTE PAGE FUNCTIONS: Updating page status");
-            this.updateStatus();
-            console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
-          })
-
+          return this.stateContainer.push().then((result: UpdateStatesResponse) => {
+              console.log("EXECUTE PAGE FUNCTIONS: Second save succeeded");
+              this.updateStatus();
+              console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
+              return Promise.resolve(result);
+            },
+            (result: UpdateStatesResponse) => {
+              console.error("EXECUTE PAGE FUNCTIONS:: Second save failed.");
+              console.log(result);
+              this.updateStatus();
+              console.log("EXECUTE PAGE FUNCTIONS: IsReadable:", page.isReadable);
+              return Promise.reject(result);
+            });
         });
     }
 

@@ -34,8 +34,7 @@ export class PageReadPage {
         return this.page.pageTransition != "next";
     }
 
-    callPageFunctions() {
-        this.readingManager.executePageFunctions(this.page);
+    continueReadingOrFinish() {
         if (this.page.pageTransition == "next") {
             this.router.navigateBack();
         } else {

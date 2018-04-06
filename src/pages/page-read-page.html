@@ -42,11 +42,11 @@
                 <p innerHtml.bind="page.content | sanitizeHTML" ref="contentElement" class="page-content"></p>
             </div>
             <div class="panel-footer text-right">
-                <button if.bind="finishPage" type="text" click.trigger="callPageFunctions()" class="btn btn-primary">
+                <button if.bind="finishPage" type="text" click.trigger="continueReadingOrFinish()" class="btn btn-primary">
                     <i class="glyphicon glyphicon-flag" aria-hidden="true"></i> Finish Story
                 </button>
 
-                <button if.bind="!finishPage" type="text" click.trigger="callPageFunctions()" class="btn btn-primary">
+                <button if.bind="!finishPage" type="text" click.trigger="continueReadingOrFinish()" class="btn btn-primary">
                     Continue Reading <i class="glyphicon glyphicon-arrow-right" aria-hidden="true"></i>
                 </button>
             </div>
