@@ -59,7 +59,7 @@ export class StateScope extends BaseModel implements VariableAccessor, Subscriba
     this.fromObject(data);
   }
 
-  fromObject(data: any = {states: [], revision: 0}) {
+  fromObject(data: any = {states: [], revision: "", revisionNumber: 0}) {
     this.typeChecker.validateAsObjectAndNotArray("StateScope States", data);
     this.readingId = data.readingId;
     this.storyId = data.storyId;
