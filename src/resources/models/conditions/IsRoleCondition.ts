@@ -9,6 +9,7 @@
  Charlie Hargood, cah07r.ecs.soton.ac.uk
  Kevin Puplett, k.e.puplett.soton.ac.uk
  David Pepper, d.pepper.soton.ac.uk
+ Callum Spawforth, cs14g13.ecs.soton.ac.uk
 
  All rights reserved.
  Redistribution and use in source and binary forms, with or without
@@ -32,48 +33,60 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import {BaseCollection} from "./BaseCollection";
-import {BaseCondition} from "../models/conditions/BaseCondition";
-import {TypeFactory} from "../factories/TypeFactory";
-import {ComparisonCondition} from "../models/conditions/ComparisonCondition";
+import {TypeChecker} from "../../utilities/TypeChecker";
 import {inject} from "aurelia-framework";
-import {CheckCondition} from "../models/conditions/CheckCondition";
-import {LocationCondition} from "../models/conditions/LocationCondition";
-import {LogicalCondition} from "../models/conditions/LogicalCondition";
-import {TimePassedCondition} from "../models/conditions/TimePassedCondition";
-import {TimeRangeCondition} from "../models/conditions/TimeRangeCondition";
-import {TrueCondition} from "../models/conditions/boolean/TrueCondition";
-import {FalseCondition} from "../models/conditions/boolean/FalseCondition";
-import {IsRoleCondition} from "../models/conditions/IsRoleCondition";
+import {ConditionCollection} from "../../collections/ConditionCollection";
+import {LocationCollection} from "../../collections/LocationCollection";
+import {LocationInformation} from "../../gps/LocationInformation";
+import {LoggingHelper} from "../../logging/LoggingHelper";
+import {VariableAccessor} from "../../interfaces/VariableAccessor";
+import {Authenticator} from "../../auth/Authenticator";
+import {IsUserInRole} from "../../utilities/RoleManagement";
+import {BaseCondition} from "./BaseCondition";
 
-@inject(
-    TypeFactory.withMapping({
-        'comparison': ComparisonCondition,
-        'check': CheckCondition,
-        'location': LocationCondition,
-        'logical': LogicalCondition,
-        'timepassed': TimePassedCondition,
-        'timerange': TimeRangeCondition,
-        'true' : TrueCondition,
-        'false': FalseCondition,
-        'isrole': IsRoleCondition
-    })
-)
-export class ConditionCollection extends BaseCollection<BaseCondition> {
+@inject(TypeChecker,
+    LoggingHelper,
+    Authenticator)
 
-    constructor(private conditionFactory: (any?) => BaseCondition, data?: any[]) {
-        super();
+export class IsRoleCondition extends BaseCondition {
 
-        if (data && Array.isArray(data)) {
-            this.saveMany(data);
+    private _role: string;
+
+    constructor(typeChecker: TypeChecker,
+                private loggingHelper: LoggingHelper,
+                private auth: Authenticator,
+                data?: any) {
+        super(typeChecker);
+
+        if (data) {
+            this.fromObject(data);
         }
     }
 
-    protected itemFromObject(item: any): BaseCondition {
-        if (item instanceof BaseCondition) {
-            return item as BaseCondition;
-        }
+    fromObject(data = {id: undefined, role: undefined}) {
+        this.typeChecker.validateAsObjectAndNotArray("Data", data);
+        this.id = data.id;
+        this.role = data.role;
+    }
 
-        return this.conditionFactory(item);
+    toJSON() {
+        return {
+            id: this.id,
+            type: "isrole",
+            role: this.role,
+        };
+    }
+
+    get role(): string {
+        return this._role;
+    }
+
+    set role(value: string) {
+        this.typeChecker.validateAsStringOrUndefined("Value", value);
+        this._role = value;
+    }
+
+    execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
+        return IsUserInRole(this.auth.userId, this.role, variables);
     }
 }

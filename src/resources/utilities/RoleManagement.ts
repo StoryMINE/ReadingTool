@@ -16,10 +16,22 @@ export function CreateUserRoleAssignmentVarRef(userId): VariableReference {
     });
 }
 
-export function GetUserRole(userId: string, variables: VariableAccessor, story: Story): Role {
+function GetUserRoleName(userId: string, variables: VariableAccessor): string {
     let roleAssignmentVariable = variables.get(CreateUserRoleAssignmentVarRef(userId));
 
-    if(!roleAssignmentVariable) { return; }
+    if(!roleAssignmentVariable) { return ""; }
+    return roleAssignmentVariable.value;
+}
 
-    return story.roles.get(roleAssignmentVariable.value);
+export function IsUserInRole(userId: string, role: Role | string, variables: VariableAccessor) {
+    if(typeof role !== "string") {
+        role = role.id;
+    }
+    return GetUserRoleName(userId, variables) == role;
+}
+
+export function GetUserRole(userId: string, variables: VariableAccessor, story: Story): Role {
+    let roleName = GetUserRoleName(userId, variables);
+
+    return story.roles.get(roleName);
 }
