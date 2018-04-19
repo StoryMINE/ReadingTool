@@ -77,8 +77,8 @@ export class LogicalCondition extends BaseCondition {
 
     set operand(value: string) {
         this.typeChecker.validateAsStringOrUndefined("Operand", value);
-        if (value !== "AND" && value !== "OR" && value !== undefined) {
-            throw TypeError("Operand can only be AND or OR");
+        if (value !== "AND" && value !== "OR" && value !== "NAND" && value !== "NOR" && value !== undefined) {
+            throw TypeError("Operand can only be AND, NAND, OR or NOR. Undefined defaults to OR.");
         }
         this._operand = value;
     }
@@ -93,10 +93,23 @@ export class LogicalCondition extends BaseCondition {
     }
 
     execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
-        if (this.operand == "AND") {
-            return this.conditions.every(conditionIdToExecute => this.lookupAndTestCondition(conditionIdToExecute, variables, conditions, locations, userLocation));
+        switch(this.operand) {
+            case "NAND":
+                return !this.performAnd(variables, conditions, locations, userLocation);
+            case "AND":
+                return this.performAnd(variables, conditions, locations, userLocation);
+            case "NOR":
+                return !this.performOr(variables, conditions, locations, userLocation);
+            default:
+                return this.performOr(variables, conditions, locations, userLocation);
         }
+    }
 
+    private performAnd(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
+        return this.conditions.every(conditionIdToExecute => this.lookupAndTestCondition(conditionIdToExecute, variables, conditions, locations, userLocation));
+    }
+
+    private performOr(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
         return this.conditions.some(conditionIdToExecute => this.lookupAndTestCondition(conditionIdToExecute, variables, conditions, locations, userLocation));
     }
 
