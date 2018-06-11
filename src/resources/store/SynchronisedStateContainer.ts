@@ -33,6 +33,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
 
   initialize(readingId: string): Promise<void> {
     this.readingId = readingId;
+
     console.log("PERFORMING INIT");
     return this.readingConnector.getStates(this.readingId).then((scopes: CombinedScopes) => {
       console.log("ASSIGNING INIT STATES");
@@ -43,7 +44,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   }
 
   beginPolling() {
-    clearInterval(this.stateUpdateTimer);
+    this.stopPolling();
     this.stateUpdateTimer = window.setInterval(() => {
       if(this.saveInProgress) { return false; }
       this.readingConnector.getStates(this.readingId).then((scopes) => {
@@ -51,6 +52,10 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
         this.replaceScopes(scopes);
       });
     }, this.updateInterval);
+  }
+
+  stopPolling() {
+    clearInterval(this.stateUpdateTimer);
   }
 
   replaceScopes(scopes: CombinedScopes) {

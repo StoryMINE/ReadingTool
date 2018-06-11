@@ -80,7 +80,6 @@ export class ReadingManager {
                 private cachedMediaConnector: CachedMediaConnector,
                 private readerFactory: (any?) => Reader,
                 public auth: Authenticator) {
-        this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
     }
 
     attach(storyId: string, readingId: string, withUpdates: boolean = true) {
@@ -94,6 +93,7 @@ export class ReadingManager {
                         this.reading = reading;
                     });
             }).then(() => {
+                this.stateContainer = new SynchronisedStateContainer(this.readingConnector);
                 return this.stateContainer.initialize(this.reading.id);
             }).then(() => {
                 if (withUpdates) {
@@ -119,6 +119,7 @@ export class ReadingManager {
         this.reading = undefined;
         this.story = undefined;
         this.detachListeners();
+        this.stateContainer.stopPolling();
     }
 
     private attachListeners() {
