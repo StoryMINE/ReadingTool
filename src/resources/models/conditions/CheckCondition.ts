@@ -80,6 +80,6 @@ export class CheckCondition extends BaseCondition{
     }
 
     execute(variables: VariableAccessor, conditions: ConditionCollection, locations: LocationCollection, userLocation: LocationInformation): boolean {
-        return variables.get(this.variable) !== undefined;
+        return variables.get(this.variable) != undefined;
     }
 }
