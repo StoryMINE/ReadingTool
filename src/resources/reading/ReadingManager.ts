@@ -123,7 +123,7 @@ export class ReadingManager {
     }
 
     private attachListeners() {
-        this.variableSub = this.stateContainer.subscribe(() => this.updateStatus());
+        //this.variableSub = this.stateContainer.subscribe(() => this.updateStatus());
         this.locationSub = this.bindingEngine.propertyObserver(this.locationManager, 'location').subscribe(() => this.updateStatus());
         this.timeSub = window.setInterval(() => this.updateStatus(), 60 * 1000);
     }
