@@ -16,6 +16,8 @@ export class PageListCustomElement {
 
     @bindable readingManager: ReadingManager;
 
+    hidePages: boolean = false;
+
     readingId: string;
     storyId: string;
 
@@ -34,9 +36,11 @@ export class PageListCustomElement {
         return this.userConfig.locationDemo
     }
 
-    @computedFrom('readingManager.viewablePages')
+    @computedFrom('readingManager.viewablePages', 'hidePages')
     get viewablePages() {
-        return this.readingManager.viewablePages
+        return this.hidePages?
+            [] :
+            this.readingManager.viewablePages
             .sort((a, b) => {
                 if (a.isReadable == b.isReadable) {
                     return a.name > b.name ? 1 : -1;

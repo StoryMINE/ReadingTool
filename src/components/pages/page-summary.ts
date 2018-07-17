@@ -3,6 +3,7 @@ import {autoinject, bindable, containerless} from "aurelia-framework";
 import {Router} from "aurelia-router";
 import {ReadingManager} from "../../resources/reading/ReadingManager";
 import {UpdateStatesResponse} from "../../resources/interfaces/UpdateStatesResponse";
+import {PageListCustomElement} from "./page-list";
 
 @autoinject()
 @containerless()
@@ -12,6 +13,7 @@ export class PageSummary{
     @bindable storyId: string;
     @bindable readingId: string;
     @bindable demoMode: boolean;
+    @bindable pageList: PageListCustomElement;
     @bindable pageFunctionsExecuting: boolean;
 
     constructor(private element: Element, private router: Router, private readingManager: ReadingManager) {}
@@ -35,6 +37,7 @@ export class PageSummary{
     }
 
     callPageFunctions() {
+        this.pageList.hidePages = true;
         if(this.pageFunctionsExecuting) { return false; }
         this.pageFunctionsExecuting = true;
 
@@ -46,7 +49,7 @@ export class PageSummary{
             });
         },
         (result: UpdateStatesResponse) => {
-            //Do nothing yet.
+            this.pageList.hidePages = false;
         }).then(() => {
             //Don't believe this is necessary, as ReadingManager should update itself.
             this.readingManager.updateStatus();
