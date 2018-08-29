@@ -37,9 +37,14 @@ export class PageSummary{
     }
 
     callPageFunctions() {
+        //Force a revalidation before allowing the page functions to execute.
+        this.readingManager.updateStatus();
+        if(!this.page.isReadable) { return; }
+
         this.pageList.hidePages = true;
-        if(this.pageFunctionsExecuting) { return false; }
+        if (this.pageFunctionsExecuting) { return false; }
         this.pageFunctionsExecuting = true;
+
 
         this.readingManager.executePageFunctionsAndSave(this.page).then((result: UpdateStatesResponse) => {
             this.router.navigateToRoute("page-read", {
