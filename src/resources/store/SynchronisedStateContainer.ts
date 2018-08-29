@@ -6,7 +6,7 @@ import {Variable} from "../models/Variable";
 import {ReadingConnector} from "./ReadingConnector";
 import {StateScope} from "../models/StateScope";
 import {CombinedScopes} from "../interfaces/ScopedStates";
-import {CompositeSubscription, SimpleSubscriptionService} from "../utilities/Subscription";
+import {CompositeSubscription, PausableSubscriptionService, SimpleSubscriptionService} from "../utilities/Subscription";
 import {UpdateStatesResponse} from "../interfaces/UpdateStatesResponse";
 
 /**
@@ -26,7 +26,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
   private saveInProgress: Promise<UpdateStatesResponse>;
 
   private stateChangeSubscription: Subscription;
-  private subscriptionService: SimpleSubscriptionService = new SimpleSubscriptionService();
+  private subscriptionService: PausableSubscriptionService = new PausableSubscriptionService();
 
   constructor(private readingConnector: ReadingConnector) {
   }
@@ -70,18 +70,7 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
     this.subscriptionService.notify();
   }
 
-  private stopWatchingStates() {
-    if (this.stateChangeSubscription) {
-      this.stateChangeSubscription.dispose();
-    }
-  }
 
-  private watchStates() {
-    let callback = this.subscriptionService.notify.bind(this.subscriptionService);
-    console.log(this.scopes);
-    this.stateChangeSubscription =
-      new CompositeSubscription(callback, [this.scopes.global, this.scopes.shared])
-  }
 
   private getScope(scopeName: string): StateScope {
     let scope: StateScope = this.scopes[scopeName];
@@ -115,6 +104,27 @@ export class SynchronisedStateContainer implements VariableAccessor, Subscribabl
 
   subscribe(callback: NotifyCallback): Subscription {
     return this.subscriptionService.subscribe(callback);
+  }
+
+  pauseNotifications() {
+    this.subscriptionService.pauseNotifications();
+  }
+
+  resumeNotifications() {
+    this.subscriptionService.resumeNotifications();
+  }
+
+  private stopWatchingStates() {
+    if (this.stateChangeSubscription) {
+      this.stateChangeSubscription.dispose();
+    }
+  }
+
+  private watchStates() {
+    let callback = this.subscriptionService.notify.bind(this.subscriptionService);
+    console.log(this.scopes);
+    this.stateChangeSubscription =
+      new CompositeSubscription(callback, [this.scopes.global, this.scopes.shared])
   }
 
 }

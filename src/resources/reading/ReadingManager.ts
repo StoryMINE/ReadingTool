@@ -123,7 +123,7 @@ export class ReadingManager {
     }
 
     private attachListeners() {
-        //this.variableSub = this.stateContainer.subscribe(() => this.updateStatus());
+        this.variableSub = this.stateContainer.subscribe(() => { this.updateStatus(); });
         this.locationSub = this.bindingEngine.propertyObserver(this.locationManager, 'location').subscribe(() => this.updateStatus());
         this.timeSub = window.setInterval(() => this.updateStatus(), 60 * 1000);
     }
@@ -163,10 +163,12 @@ export class ReadingManager {
     }
 
     executePageFunctionsAndSave(page: Page): Promise<UpdateStatesResponse> {
+        //Pause notifications while updating, else we'll get a ton.
+        this.stateContainer.pauseNotifications();
         this.executePageFunctionsImpl(page);
 
         //Attempt to save, handling collisions.
-        return this.stateContainer.push().catch((result: UpdateStatesResponse) => {
+        let pushResult = this.stateContainer.push().catch((result: UpdateStatesResponse) => {
             console.log("COLLISION: Checking for a collision.");
             if(result && result.collision) {
                 console.log("COLLISION: Attempting to resolve");
@@ -194,6 +196,11 @@ export class ReadingManager {
                     return Promise.reject(result);
                 });
         });
+
+        return pushResult.then(() => {
+          this.stateContainer.resumeNotifications();
+          return pushResult;
+        })
     }
 
     saveReading() {

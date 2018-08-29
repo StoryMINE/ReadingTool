@@ -1,3 +1,4 @@
+import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
 
 export class SimpleSubscriptionService implements Subscribable {
 
@@ -19,7 +20,32 @@ export class SimpleSubscriptionService implements Subscribable {
   }
 }
 
-import {NotifyCallback, Subscribable, Subscription} from "../interfaces/Subscription";
+export class PausableSubscriptionService extends SimpleSubscriptionService {
+  private notificationsPaused: boolean = false;
+  private notificationOccurredWhilePaused: boolean = false;
+
+  notify() {
+    if(this.notificationsPaused) {
+      this.notificationOccurredWhilePaused = true;
+    } else {
+      super.notify();
+    }
+  }
+
+  pauseNotifications() {
+    this.notificationsPaused = true;
+  }
+
+  resumeNotifications() {
+    this.notificationsPaused = false;
+
+    if(this.notificationOccurredWhilePaused) {
+      super.notify();
+      this.notificationOccurredWhilePaused = false;
+    }
+  }
+}
+
 
 export class SimpleSubscription implements Subscription {
   paused: boolean = false;
