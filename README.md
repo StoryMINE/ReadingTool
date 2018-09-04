@@ -1,5 +1,15 @@
-StoryPlaces
+StoryMINE - A StoryPlaces Extension
 ------------
+StoryMINE is an extension to the StoryPlaces platform that enables the telling of MINEs - multiplayer interactive narrative experiences. These multiplayer narratives focus on permitting multiple players to experience distinct threads of a shared, pre-authored story. 
+
+Changes to StoryPlaces are Copyright (c) 2018 University of Southampton
+
+Callum Spawforth, cs14g13 (at) soton.ac.uk
+
+The original copyright notice for StoryPlaces is reproduced below.
+
+### Original Copyright Notice
+
 This application was developed as part of the Leverhulme Trust funded
 StoryPlaces Project. For more information, please visit storyplaces.soton.ac.uk
 Copyright (c) 2017 University of Southampton
