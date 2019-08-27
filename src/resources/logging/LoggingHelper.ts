@@ -77,7 +77,7 @@ export class LoggingHelper {
             variableName: variableName,
             variableValue: variableValue
         });
-        this.logEventConnector.save(event);
+        //this.logEventConnector.save(event);
     }
 
     logDemoModeStateSet(state: boolean) {

@@ -17,6 +17,7 @@ export class StoryReadingPage {
 
     showUpArrow: boolean = false;
     showDownArrow: boolean = false;
+    showMap: boolean = false;
 
     constructor(private readingManager: ReadingManager,
                 private loggingHelper: LoggingHelper,
