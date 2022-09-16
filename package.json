@@ -15,7 +15,7 @@
     "text": "github:requirejs/text#latest",
     "@types/leaflet": "^1.2.0",
     "aurelia-fetch-client": "^1.1.3",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "jquery": "^3.2.1",
     "leaflet": "^1.2.0",
     "moment": "^2.19.1",
